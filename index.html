@@ -1078,201 +1078,6 @@ body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min
 </div>
 
 <script>
-// ══════════════════════════════════════════════════════
-// SUPABASE CONFIG — paste your URL and anon key here
-// ══════════════════════════════════════════════════════
-var SUPABASE_URL = 'https://hpvnqnahwvcxwkjejcvz.supabase.co';
-var SUPABASE_KEY = 'sb_publishable_oOOfYCAk9f-aPbIDKP3KMA_G4__10TI';
-var _sb = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
-
-// ── DB — in-memory cache, synced from Supabase ──
-var DB = {
-  sessions: [],
-  attendance: {},
-  plans: [],
-  templates: [],
-  settings: {},
-  rounds: []
-};
-
-// ── LOW-LEVEL HELPERS ────────────────────────────────
-async function sbGet(table) {
-  var res = await _sb.from(table).select('*');
-  if (res.error) { console.error('sbGet ' + table, res.error); return []; }
-  return res.data || [];
-}
-async function sbUpsert(table, row) {
-  var res = await _sb.from(table).upsert(row, {onConflict:'id'});
-  if (res.error) console.error('sbUpsert ' + table, res.error);
-  return res;
-}
-async function sbDelete(table, id) {
-  var res = await _sb.from(table).delete().eq('id', id);
-  if (res.error) console.error('sbDelete ' + table, res.error);
-  return res;
-}
-async function sbSetting(key, value) {
-  var res = await _sb.from('settings').upsert({id: key, value: JSON.stringify(value)}, {onConflict:'id'});
-  if (res.error) console.error('sbSetting', res.error);
-}
-async function sbGetSetting(key) {
-  var res = await _sb.from('settings').select('value').eq('id', key).single();
-  if (res.error || !res.data) return null;
-  try { return JSON.parse(res.data.value); } catch(e) { return res.data.value; }
-}
-
-// ── LOAD ALL DATA FROM SUPABASE ON STARTUP ────────────
-async function loadAllData() {
-  showLoadingOverlay(true);
-  try {
-    // Test connection first with a simple ping
-    var testRes = await Promise.race([
-      _sb.from('settings').select('id').limit(1),
-      new Promise(function(_, reject) {
-        setTimeout(function() { reject(new Error('Connection timed out after 8 seconds')); }, 8000);
-      })
-    ]);
-
-    if (testRes.error) {
-      throw new Error('Database error: ' + testRes.error.message + ' (code: ' + testRes.error.code + ')');
-    }
-
-    // Sessions
-    var sessRes = await _sb.from('sessions').select('*');
-    if (sessRes.error) throw new Error('sessions: ' + sessRes.error.message);
-    DB.sessions = sessRes.data || [];
-
-    // Attendance
-    var attRes = await _sb.from('attendance').select('*');
-    if (attRes.error) throw new Error('attendance: ' + attRes.error.message);
-    DB.attendance = {};
-    (attRes.data || []).forEach(function(r) {
-      if (!DB.attendance[r.session_id]) DB.attendance[r.session_id] = [];
-      DB.attendance[r.session_id].push({
-        name: r.name, role: r.role, dept: r.dept,
-        eid: r.eid, email: r.email,
-        timestamp: r.timestamp, manual: r.manual
-      });
-    });
-
-    // Plans
-    var plansRes = await _sb.from('plans').select('*');
-    if (plansRes.error) throw new Error('plans: ' + plansRes.error.message);
-    DB.plans = plansRes.data || [];
-
-    // Templates
-    var tmplRes = await _sb.from('templates').select('*');
-    if (tmplRes.error) throw new Error('templates: ' + tmplRes.error.message);
-    DB.templates = tmplRes.data || [];
-
-    // Rounds
-    var roundsRes = await _sb.from('rounds').select('*');
-    if (roundsRes.error) throw new Error('rounds: ' + roundsRes.error.message);
-    DB.rounds = (roundsRes.data || []).map(function(r) {
-      return Object.assign({}, r, {
-        responses: r.responses || {},
-        deficiencies: r.deficiencies || [],
-        stats: r.stats || {}
-      });
-    });
-
-    // Settings
-    var setRes = await _sb.from('settings').select('*');
-    if (setRes.error) throw new Error('settings: ' + setRes.error.message);
-    DB.settings = {};
-    (setRes.data || []).forEach(function(r) {
-      try { DB.settings[r.id] = JSON.parse(r.value); }
-      catch(e) { DB.settings[r.id] = r.value; }
-    });
-
-    console.log('Supabase loaded OK — sessions:', DB.sessions.length, 'rounds:', DB.rounds.length);
-
-  } catch(e) {
-    console.error('loadAllData FAILED:', e.message);
-    showLoadingOverlay(false);
-    // Show detailed error on screen
-    var overlay = document.getElementById('loading-overlay');
-    if (overlay) {
-      overlay.style.display = 'flex';
-      overlay.innerHTML =
-        '<div style="text-align:center;padding:30px 20px;max-width:520px;">' +
-        '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
-        '<div style="font-size:17px;font-weight:700;color:#dc2626;margin-bottom:10px;">Connection Failed</div>' +
-        '<div style="font-size:12.5px;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;text-align:left;font-family:monospace;word-break:break-all;margin-bottom:16px;">' + e.message + '</div>' +
-        '<div style="font-size:12px;color:#6b7280;line-height:1.7;text-align:left;">' +
-        '<b>Things to check:</b><br>' +
-        '1. Your Supabase project is not paused (check supabase.com)<br>' +
-        '2. You ran the SQL setup script in the SQL Editor<br>' +
-        '3. RLS policies allow anon access (run the fix SQL again)<br>' +
-        '4. Your URL and key in the HTML file are correct' +
-        '</div>' +
-        '<button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Retry</button>' +
-        '</div>';
-    }
-    return;
-  }
-  showLoadingOverlay(false);
-}
-
-// ── SAVE HELPERS (called throughout the app) ──────────
-// These replace the old synchronous localStorage save()
-function save() {
-  // legacy no-op — individual saves handle persistence now
-}
-function saveRounds() {
-  // no-op — rounds saved individually via saveRoundToDB
-}
-
-// ── INDIVIDUAL SAVE FUNCTIONS ─────────────────────────
-
-async function saveSession(session) {
-  await sbUpsert('sessions', session);
-}
-async function deleteSessionDB(id) {
-  await sbDelete('sessions', id);
-  // delete all attendance for this session
-  await _sb.from('attendance').delete().eq('session_id', id);
-}
-async function saveAttendee(sessionId, attendee) {
-  var row = Object.assign({}, attendee, {
-    id: 'att_' + sessionId + '_' + Date.now(),
-    session_id: sessionId
-  });
-  await sbUpsert('attendance', row);
-  return row;
-}
-async function deleteAttendeeDB(sessionId, idx) {
-  // Rebuild from DB attendance for this session to find the right row
-  var res = await _sb.from('attendance').select('id').eq('session_id', sessionId);
-  if (res.error || !res.data || !res.data[idx]) return;
-  await sbDelete('attendance', res.data[idx].id);
-}
-async function savePlan(plan) {
-  await sbUpsert('plans', plan);
-}
-async function deletePlanDB(id) {
-  await sbDelete('plans', id);
-}
-async function saveTemplate(tmpl) {
-  await sbUpsert('templates', tmpl);
-}
-async function deleteTemplateDB(id) {
-  await sbDelete('templates', id);
-}
-async function saveSettingKey(key, value) {
-  await sbSetting(key, value);
-  DB.settings[key] = value;
-}
-async function saveRoundToDB(round) {
-  var row = Object.assign({}, round, {
-    responses: round.responses,
-    deficiencies: round.deficiencies,
-    stats: round.stats
-  });
-  await sbUpsert('rounds', row);
-}
-async function deleteRoundDB(id) {
-  await sbDelete('rounds', id);
 }
 
 // ── LOADING OVERLAY ───────────────────────────────────
@@ -1948,6 +1753,203 @@ function fTime(t){if(!t)return'';var parts=t.split(':').map(Number);var h=parts[
 function fTS(ts){return new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
 
 // ── INIT ──
+
+// ══════════════════════════════════════════════════════
+// SUPABASE CONFIG — paste your URL and anon key here
+// ══════════════════════════════════════════════════════
+var SUPABASE_URL = 'https://hpvnqnahwvcxwkjejcvz.supabase.co';
+var SUPABASE_KEY = 'sb_publishable_oOOfYCAk9f-aPbIDKP3KMA_G4__10TI';
+var _sb = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// ── DB — in-memory cache, synced from Supabase ──
+var DB = {
+  sessions: [],
+  attendance: {},
+  plans: [],
+  templates: [],
+  settings: {},
+  rounds: []
+};
+
+// ── LOW-LEVEL HELPERS ────────────────────────────────
+async function sbGet(table) {
+  var res = await _sb.from(table).select('*');
+  if (res.error) { console.error('sbGet ' + table, res.error); return []; }
+  return res.data || [];
+}
+async function sbUpsert(table, row) {
+  var res = await _sb.from(table).upsert(row, {onConflict:'id'});
+  if (res.error) console.error('sbUpsert ' + table, res.error);
+  return res;
+}
+async function sbDelete(table, id) {
+  var res = await _sb.from(table).delete().eq('id', id);
+  if (res.error) console.error('sbDelete ' + table, res.error);
+  return res;
+}
+async function sbSetting(key, value) {
+  var res = await _sb.from('settings').upsert({id: key, value: JSON.stringify(value)}, {onConflict:'id'});
+  if (res.error) console.error('sbSetting', res.error);
+}
+async function sbGetSetting(key) {
+  var res = await _sb.from('settings').select('value').eq('id', key).single();
+  if (res.error || !res.data) return null;
+  try { return JSON.parse(res.data.value); } catch(e) { return res.data.value; }
+}
+
+// ── LOAD ALL DATA FROM SUPABASE ON STARTUP ────────────
+async function loadAllData() {
+  showLoadingOverlay(true);
+  try {
+    // Test connection first with a simple ping
+    var testRes = await Promise.race([
+      _sb.from('settings').select('id').limit(1),
+      new Promise(function(_, reject) {
+        setTimeout(function() { reject(new Error('Connection timed out after 8 seconds')); }, 8000);
+      })
+    ]);
+
+    if (testRes.error) {
+      throw new Error('Database error: ' + testRes.error.message + ' (code: ' + testRes.error.code + ')');
+    }
+
+    // Sessions
+    var sessRes = await _sb.from('sessions').select('*');
+    if (sessRes.error) throw new Error('sessions: ' + sessRes.error.message);
+    DB.sessions = sessRes.data || [];
+
+    // Attendance
+    var attRes = await _sb.from('attendance').select('*');
+    if (attRes.error) throw new Error('attendance: ' + attRes.error.message);
+    DB.attendance = {};
+    (attRes.data || []).forEach(function(r) {
+      if (!DB.attendance[r.session_id]) DB.attendance[r.session_id] = [];
+      DB.attendance[r.session_id].push({
+        name: r.name, role: r.role, dept: r.dept,
+        eid: r.eid, email: r.email,
+        timestamp: r.timestamp, manual: r.manual
+      });
+    });
+
+    // Plans
+    var plansRes = await _sb.from('plans').select('*');
+    if (plansRes.error) throw new Error('plans: ' + plansRes.error.message);
+    DB.plans = plansRes.data || [];
+
+    // Templates
+    var tmplRes = await _sb.from('templates').select('*');
+    if (tmplRes.error) throw new Error('templates: ' + tmplRes.error.message);
+    DB.templates = tmplRes.data || [];
+
+    // Rounds
+    var roundsRes = await _sb.from('rounds').select('*');
+    if (roundsRes.error) throw new Error('rounds: ' + roundsRes.error.message);
+    DB.rounds = (roundsRes.data || []).map(function(r) {
+      return Object.assign({}, r, {
+        responses: r.responses || {},
+        deficiencies: r.deficiencies || [],
+        stats: r.stats || {}
+      });
+    });
+
+    // Settings
+    var setRes = await _sb.from('settings').select('*');
+    if (setRes.error) throw new Error('settings: ' + setRes.error.message);
+    DB.settings = {};
+    (setRes.data || []).forEach(function(r) {
+      try { DB.settings[r.id] = JSON.parse(r.value); }
+      catch(e) { DB.settings[r.id] = r.value; }
+    });
+
+    console.log('Supabase loaded OK — sessions:', DB.sessions.length, 'rounds:', DB.rounds.length);
+
+  } catch(e) {
+    console.error('loadAllData FAILED:', e.message);
+    showLoadingOverlay(false);
+    // Show detailed error on screen
+    var overlay = document.getElementById('loading-overlay');
+    if (overlay) {
+      overlay.style.display = 'flex';
+      overlay.innerHTML =
+        '<div style="text-align:center;padding:30px 20px;max-width:520px;">' +
+        '<div style="font-size:36px;margin-bottom:12px;">⚠️</div>' +
+        '<div style="font-size:17px;font-weight:700;color:#dc2626;margin-bottom:10px;">Connection Failed</div>' +
+        '<div style="font-size:12.5px;color:#374151;background:#f9fafb;border:1px solid #e5e7eb;border-radius:8px;padding:12px 14px;text-align:left;font-family:monospace;word-break:break-all;margin-bottom:16px;">' + e.message + '</div>' +
+        '<div style="font-size:12px;color:#6b7280;line-height:1.7;text-align:left;">' +
+        '<b>Things to check:</b><br>' +
+        '1. Your Supabase project is not paused (check supabase.com)<br>' +
+        '2. You ran the SQL setup script in the SQL Editor<br>' +
+        '3. RLS policies allow anon access (run the fix SQL again)<br>' +
+        '4. Your URL and key in the HTML file are correct' +
+        '</div>' +
+        '<button onclick="location.reload()" style="margin-top:16px;padding:8px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;font-size:13px;">Retry</button>' +
+        '</div>';
+    }
+    return;
+  }
+  showLoadingOverlay(false);
+}
+
+// ── SAVE HELPERS (called throughout the app) ──────────
+// These replace the old synchronous localStorage save()
+function save() {
+  // legacy no-op — individual saves handle persistence now
+}
+function saveRounds() {
+  // no-op — rounds saved individually via saveRoundToDB
+}
+
+// ── INDIVIDUAL SAVE FUNCTIONS ─────────────────────────
+
+async function saveSession(session) {
+  await sbUpsert('sessions', session);
+}
+async function deleteSessionDB(id) {
+  await sbDelete('sessions', id);
+  // delete all attendance for this session
+  await _sb.from('attendance').delete().eq('session_id', id);
+}
+async function saveAttendee(sessionId, attendee) {
+  var row = Object.assign({}, attendee, {
+    id: 'att_' + sessionId + '_' + Date.now(),
+    session_id: sessionId
+  });
+  await sbUpsert('attendance', row);
+  return row;
+}
+async function deleteAttendeeDB(sessionId, idx) {
+  // Rebuild from DB attendance for this session to find the right row
+  var res = await _sb.from('attendance').select('id').eq('session_id', sessionId);
+  if (res.error || !res.data || !res.data[idx]) return;
+  await sbDelete('attendance', res.data[idx].id);
+}
+async function savePlan(plan) {
+  await sbUpsert('plans', plan);
+}
+async function deletePlanDB(id) {
+  await sbDelete('plans', id);
+}
+async function saveTemplate(tmpl) {
+  await sbUpsert('templates', tmpl);
+}
+async function deleteTemplateDB(id) {
+  await sbDelete('templates', id);
+}
+async function saveSettingKey(key, value) {
+  await sbSetting(key, value);
+  DB.settings[key] = value;
+}
+async function saveRoundToDB(round) {
+  var row = Object.assign({}, round, {
+    responses: round.responses,
+    deficiencies: round.deficiencies,
+    stats: round.stats
+  });
+  await sbUpsert('rounds', row);
+}
+async function deleteRoundDB(id) {
+  await sbDelete('rounds', id);
+
 (async function init(){
   var hash=window.location.hash;
   // Check if config has been set
