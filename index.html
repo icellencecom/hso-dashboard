@@ -6,7 +6,7 @@
 <title>HSO Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://unpkg.com/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
 <style>
 :root{
   --bg:#f4f6f9;--white:#fff;--border:#e4e8ef;
@@ -1083,7 +1083,7 @@ body{background:var(--bg);color:var(--text);font-family:"DM Sans",sans-serif;min
 // ══════════════════════════════════════════════════════
 var SUPABASE_URL = 'https://hpvnqnahwvcxwkjejcvz.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_oOOfYCAk9f-aPbIDKP3KMA_G4__10TI';
-var _sb = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+var _sb = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 
 // ── DB — in-memory cache, synced from Supabase ──
 var DB = {
@@ -1951,6 +1951,12 @@ function fTS(ts){return new Date(ts).toLocaleString('en-US',{month:'short',day:'
 (async function init(){
   var hash=window.location.hash;
   // Check if config has been set
+  if(!_sb){
+    showLoadingOverlay(false);
+    var ov2=document.getElementById('loading-overlay');
+    if(ov2){ov2.style.display='flex';ov2.innerHTML='<div style="text-align:center;padding:30px;"><div style="font-size:36px;">📡</div><div style="font-size:16px;font-weight:700;color:#dc2626;margin:10px 0;">Supabase library failed to load</div><div style="font-size:13px;color:#6b7280;">Check your internet connection and reload.</div><button onclick="location.reload()" style="margin-top:14px;padding:8px 20px;background:#1d4ed8;color:#fff;border:none;border-radius:8px;cursor:pointer;">Reload</button></div>';}
+    return;
+  }
   if(SUPABASE_URL === 'YOUR_SUPABASE_URL'){
     showLoadingOverlay(false);
     document.getElementById('loading-overlay').innerHTML =
