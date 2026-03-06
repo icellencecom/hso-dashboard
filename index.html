@@ -1799,7 +1799,6 @@ async function sbGetSetting(key) {
 
 // ── LOAD ALL DATA FROM SUPABASE ON STARTUP ────────────
 async function loadAllData() {
-  showLoadingOverlay(true);
   try {
     // Test connection first with a simple ping
     var testRes = await Promise.race([
@@ -1865,7 +1864,6 @@ async function loadAllData() {
 
   } catch(e) {
     console.error('loadAllData FAILED:', e.message);
-    showLoadingOverlay(false);
     // Show detailed error on screen
     var overlay = document.getElementById('loading-overlay');
     if (overlay) {
@@ -1887,10 +1885,7 @@ async function loadAllData() {
     }
     return;
   }
-  showLoadingOverlay(false);
-}
-
-// ── SAVE HELPERS (called throughout the app) ──────────
+}// ── SAVE HELPERS (called throughout the app) ──────────
 // These replace the old synchronous localStorage save()
 function save() {
   // legacy no-op — individual saves handle persistence now
@@ -1970,17 +1965,23 @@ async function deleteRoundDB(id) {
     document.getElementById('loading-overlay').style.display='flex';
     return;
   }
-  await loadAllData();
-  if(DB.settings.appLogo)document.getElementById('nav-logo').src=DB.settings.appLogo;
-  if(DB.settings.username){
-    var p=DB.settings.username.split(' ');
-    document.getElementById('nav-initials').textContent=(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
-    document.getElementById('nav-name').textContent=DB.settings.username+(DB.settings.usertitle?' · '+DB.settings.usertitle:'');
-  }
-  if(DB.settings.hosp)document.getElementById('dash-title').textContent=DB.settings.hosp+' — EOC Overview';
-  updateTrainingStats();
+  // Show dashboard immediately — don't block on data load
   if(hash.indexOf('#signin-')===0){showView('signin');loadSignIn(hash.replace('#signin-',''));}
   else showView('dashboard');
+
+  // Load data in background, then refresh UI
+  loadAllData().then(function(){
+    if(DB.settings.appLogo)document.getElementById('nav-logo').src=DB.settings.appLogo;
+    if(DB.settings.username){
+      var p=DB.settings.username.split(' ');
+      document.getElementById('nav-initials').textContent=(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
+      document.getElementById('nav-name').textContent=DB.settings.username+(DB.settings.usertitle?' · '+DB.settings.usertitle:'');
+    }
+    if(DB.settings.hosp)document.getElementById('dash-title').textContent=DB.settings.hosp+' — EOC Overview';
+    updateTrainingStats();
+  }).catch(function(e){
+    console.error('Background load failed:', e);
+  });
 })();
 
 
@@ -2886,7 +2887,7 @@ function exportRoundsCSV(){
 </div>
 
 <!-- Loading Overlay -->
-<div id="loading-overlay" style="display:flex;position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
+<div id="loading-overlay" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.92);z-index:9999;align-items:center;justify-content:center;flex-direction:column;gap:14px;">
   <div style="width:38px;height:38px;border:3px solid #e5e7eb;border-top-color:#1d4ed8;border-radius:50%;animation:spin .7s linear infinite;"></div>
   <div style="font-size:14px;color:#6b7280;font-weight:500;">Loading data from Supabase...</div>
 </div>
