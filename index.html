@@ -4115,7 +4115,7 @@ function dashSend(){
 
   // Build search-ready query
   var searchQ = buildSearchQuery(q);
-  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ) + '&udm=50';
 
   // Show result card with search link
   var card = document.createElement('div');
@@ -4155,7 +4155,7 @@ async function kbSend(){
 
   // Build web search and show result card
   var searchQ = buildSearchQuery(q);
-  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ) + '&udm=50';
   if(typingEl) typingEl.remove();
 
   var card = document.createElement('div');
