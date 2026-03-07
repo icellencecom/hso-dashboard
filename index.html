@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta name="color-scheme" content="dark"><meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
 <title>Hospital Safety Officer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
@@ -35,7 +35,7 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
 html{background:#0d0f15;}
-html,body{min-height:100%;}
+html,body{min-height:100%;overflow-x:hidden;width:100%;max-width:100vw;}
 body{font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;
      background:#0d0f15 !important;color:#e8eaf1 !important;-webkit-font-smoothing:antialiased;}
 ::-webkit-scrollbar{width:5px;height:5px;}
@@ -85,7 +85,7 @@ body{font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;
 .nav-uname{font-size:12px;color:var(--t2);font-weight:500;}
 
 /* SHELL */
-.shell{max-width:1120px;margin:0 auto;padding:32px 24px 64px;}
+.shell{max-width:1120px;margin:0 auto;padding:32px 24px 64px;box-sizing:border-box;width:100%;}
 @media(max-width:600px){.shell{padding:16px 14px 48px;}}
 
 /* VIEWS */
@@ -126,12 +126,12 @@ body{font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;
 /* MODULE CARDS (13) */
 .mc-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(4,minmax(0,1fr));
   gap:12px;
   margin-bottom:28px;
 }
-@media(max-width:900px){.mc-grid{grid-template-columns:repeat(3,1fr);}}
-@media(max-width:560px){.mc-grid{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:900px){.mc-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:560px){.mc-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 
 .mc{
   display:flex;flex-direction:column;align-items:center;justify-content:center;
@@ -160,7 +160,7 @@ body{font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;
 /* STAT CARDS */
 .stat-grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:12px;
   margin-bottom:28px;
 }
@@ -308,8 +308,8 @@ textarea{resize:vertical;min-height:76px;}
 .plan-card:hover{background:var(--s3);border-color:var(--bd2);}
 .plan-ico{width:40px;height:40px;border-radius:10px;background:var(--gbg);
   display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:18px;}
-.dept-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:20px;}
-@media(max-width:700px){.dept-grid{grid-template-columns:repeat(2,1fr);}}
+.dept-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:20px;}
+@media(max-width:700px){.dept-grid{grid-template-columns:repeat(2,minmax(0,1fr));}}
 .dept-card{background:var(--s2);border:1px solid var(--bd);border-top:3px solid var(--dc,var(--green));
   border-radius:var(--r);padding:16px;cursor:pointer;transition:all .15s;}
 .dept-card:hover{background:var(--s3);transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.4);}
@@ -500,6 +500,33 @@ textarea{resize:vertical;min-height:76px;}
     </button>
   </div>
 
+  <div class="sec-label">Compliance Assistant</div>
+  <div class="panel" style="display:flex;flex-direction:column;margin-bottom:20px;">
+    <div class="ai-hdr">
+      <span class="ai-dot"></span>
+      <span class="panel-title" style="margin-bottom:0;">AI Compliance Assistant</span>
+      <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
+        <span style="font-size:10px;background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.3);border-radius:var(--pill);padding:2px 8px;font-weight:700;">🔍 Web Search</span>
+        <button onclick="clearAIChat()" style="font-size:10px;background:none;border:1px solid var(--bd2);color:var(--t3);border-radius:var(--pill);padding:2px 8px;cursor:pointer;">Clear</button>
+      </span>
+    </div>
+    <div class="ai-msgs" id="ai-msgs" style="max-height:200px;">
+      <div class="ai-in">Ask about <strong>TJC</strong>, <strong>DNV</strong>, <strong>OSHA</strong>, <strong>NFPA</strong>, <strong>CMS</strong>, or any healthcare safety topic. I will open a focused web search so you get current, official guidance.</div>
+    </div>
+    <div class="ai-chips">
+      <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">TJC fire door requirements?</button>
+      <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">OSHA 300 log requirements</button>
+      <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">DNV vs TJC differences?</button>
+      <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">NFPA 99 risk categories</button>
+    </div>
+    <div class="ai-row">
+      <input id="ai-input" class="ai-input" type="text" placeholder="Search TJC, OSHA, NFPA, CMS, DNV..." inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')dashSend()"/>
+      <button class="ai-send" onclick="dashSend()" ontouchend="event.preventDefault();dashSend()">
+        <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
+      </button>
+    </div>
+  </div>
+
   <div class="sec-label">Status</div>
   <div class="stat-grid">
 
@@ -565,53 +592,25 @@ textarea{resize:vertical;min-height:76px;}
 
   </div>
 
-  <div class="bottom-row">
-    <div class="panel">
-      <div class="panel-title">Recent Activity</div>
-      <div class="act-item">
-        <div class="act-ico" style="background:var(--gbg);">
-          <svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M20 6L9 17l-5-5"/></svg>
-        </div>
-        <div class="act-text">Fire door inspection <em>— Floor 3 complete</em></div>
+  <div class="panel" style="margin-bottom:20px;">
+    <div class="panel-title">Recent Activity</div>
+    <div class="act-item">
+      <div class="act-ico" style="background:var(--gbg);">
+        <svg viewBox="0 0 24 24" style="stroke:var(--green)"><path d="M20 6L9 17l-5-5"/></svg>
       </div>
-      <div class="act-item">
-        <div class="act-ico" style="background:var(--ybg);">
-          <svg viewBox="0 0 24 24" style="stroke:var(--yellow)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
-        </div>
-        <div class="act-text">ILSM policy update <em>— Needs review</em></div>
-      </div>
-      <div class="act-item">
-        <div class="act-ico" style="background:var(--rbg);">
-          <svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
-        </div>
-        <div class="act-text">Sprinkler test due <em>— Tomorrow</em></div>
-      </div>
+      <div class="act-text">Fire door inspection <em>— Floor 3 complete</em></div>
     </div>
-
-    <div class="panel" style="display:flex;flex-direction:column;">
-      <div class="ai-hdr">
-        <span class="ai-dot"></span>
-        <span class="panel-title" style="margin-bottom:0;">AI Compliance Assistant</span>
-        <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.3);border-radius:var(--pill);padding:2px 8px;font-weight:700;">🔍 Web Search</span>
-          <button onclick="clearAIChat()" style="font-size:10px;background:none;border:1px solid var(--bd2);color:var(--t3);border-radius:var(--pill);padding:2px 8px;cursor:pointer;">Clear</button>
-        </span>
+    <div class="act-item">
+      <div class="act-ico" style="background:var(--ybg);">
+        <svg viewBox="0 0 24 24" style="stroke:var(--yellow)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
-      <div class="ai-msgs" id="ai-msgs" style="max-height:200px;">
-        <div class="ai-in">Ask about <strong>TJC</strong>, <strong>DNV</strong>, <strong>OSHA</strong>, <strong>NFPA</strong>, <strong>CMS</strong>, or any healthcare safety topic. I'll open a focused web search so you get current, official guidance.</div>
+      <div class="act-text">ILSM policy update <em>— Needs review</em></div>
+    </div>
+    <div class="act-item">
+      <div class="act-ico" style="background:var(--rbg);">
+        <svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg>
       </div>
-      <div class="ai-chips">
-        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">TJC fire door requirements?</button>
-        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">OSHA 300 log requirements</button>
-        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">DNV vs TJC differences?</button>
-        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">NFPA 99 risk categories</button>
-      </div>
-      <div class="ai-row">
-        <input id="ai-input" class="ai-input" type="text" placeholder="Search TJC, OSHA, NFPA, CMS, DNV..." inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')dashSend()"/>
-        <button class="ai-send" onclick="dashSend()" ontouchend="event.preventDefault();dashSend()">
-          <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
-        </button>
-      </div>
+      <div class="act-text">Sprinkler test due <em>— Tomorrow</em></div>
     </div>
   </div>
 
@@ -1560,7 +1559,7 @@ textarea{resize:vertical;min-height:76px;}
       </div>
     </div>
 
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:28px;">
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:28px;">
       <div style="background:var(--s2);border:1px solid var(--bd);border-radius:14px;padding:16px;text-align:center;">
         <div style="font-family:Nunito,sans-serif;font-size:30px;font-weight:900;color:var(--green);" id="rnd-completed">0</div>
         <div style="font-size:12px;color:var(--t2);margin-top:3px;">This Month</div>
@@ -1580,7 +1579,7 @@ textarea{resize:vertical;min-height:76px;}
     </div>
 
     <div style="font-family:Nunito,sans-serif;font-size:11px;font-weight:800;color:var(--t3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:14px;">Departments</div>
-    <div id="dept-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;"></div>
+    <div id="dept-grid" style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;"></div>
   </div>
 
   <!-- CHECKLIST FORM -->
@@ -1776,7 +1775,7 @@ textarea{resize:vertical;min-height:76px;}
   </div>
 
   <!-- Stats row -->
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;" id="kb-stats">
+  <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-bottom:24px;" id="kb-stats">
     <div style="background:var(--s2);border:1px solid var(--bd);border-radius:var(--r);padding:16px;text-align:center;">
       <div style="font-family:'Nunito',sans-serif;font-size:28px;font-weight:900;color:var(--green);" id="kb-count">0</div>
       <div style="font-size:12px;color:var(--t2);margin-top:4px;">Total Documents</div>
@@ -1907,6 +1906,16 @@ function showLoadingOverlay(show) {
   if (el) el.style.display = show ? 'flex' : 'none';
 }
 
+function setGreeting(){
+  var n = new Date();
+  var h = n.getHours();
+  var period = h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+  var emoji = h < 12 ? '🌅' : h < 17 ? '☀️' : '🌙';
+  var name = (DB.settings && DB.settings.username) ? DB.settings.username.split(' ')[0] : 'Jason';
+  var el = document.getElementById('dash-greet');
+  if(el) el.textContent = 'Good ' + period + ', ' + name + ' ' + emoji;
+}
+
 function showToast(msg, type) {
   var el = document.getElementById('toast');
   if (!el) return;
@@ -1920,6 +1929,8 @@ function tick(){
   var n=new Date(),h=n.getHours()%12||12,m=String(n.getMinutes()).padStart(2,'0'),s=String(n.getSeconds()).padStart(2,'0');
   document.getElementById('clock').textContent=String(h).padStart(2,'0')+':'+m+':'+s+' '+(n.getHours()>=12?'PM':'AM');
 }
+tick(); // run immediately so clock shows on page load
+setInterval(tick, 1000); // keep it ticking
 
 var ALL_VIEWS = ['dashboard','lifesafety','safety','security','hazmat','utilities','equipment','emergency','inspections','investigation','rounds','risk','training','assessments','forms','knowledge','signin','settings'];
 
