@@ -190,27 +190,43 @@ body{font-family:"DM Sans",sans-serif;font-size:14px;line-height:1.55;
 .act-text em{font-style:normal;color:var(--t2);font-weight:400;}
 
 /* AI */
-.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
-.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite;}
-.ai-msgs{display:flex;flex-direction:column;gap:8px;max-height:148px;overflow-y:auto;margin-bottom:12px;scroll-behavior:smooth;}
-.ai-in{background:var(--s3);border-radius:12px 12px 12px 4px;padding:10px 13px;font-size:13px;color:var(--t2);line-height:1.65;max-width:92%;}
-.ai-out{background:rgba(88,204,2,.12);border:1px solid var(--gbd);border-radius:12px 12px 4px 12px;padding:10px 13px;font-size:13px;color:var(--t1);line-height:1.5;max-width:88%;align-self:flex-end;font-weight:600;}
+.ai-hdr{display:flex;align-items:center;gap:8px;margin-bottom:14px;flex-wrap:wrap;}
+.ai-dot{width:8px;height:8px;border-radius:50%;background:var(--green);animation:blink 2s infinite;flex-shrink:0;}
+.ai-msgs{display:flex;flex-direction:column;gap:8px;max-height:220px;overflow-y:auto;margin-bottom:12px;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;}
+.ai-in{background:var(--s3);border-radius:12px 12px 12px 4px;padding:10px 13px;font-size:13px;color:var(--t2);line-height:1.65;max-width:92%;word-break:break-word;}
+.ai-out{background:rgba(88,204,2,.12);border:1px solid var(--gbd);border-radius:12px 12px 4px 12px;padding:10px 13px;font-size:13px;color:var(--t1);line-height:1.5;max-width:88%;align-self:flex-end;font-weight:600;word-break:break-word;}
 .ai-usr{background:var(--green);color:#fff;border-radius:12px;padding:10px 13px;font-size:13px;
-        line-height:1.5;align-self:flex-end;max-width:85%;margin-left:auto;}
+        line-height:1.5;align-self:flex-end;max-width:85%;margin-left:auto;word-break:break-word;}
 .ai-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:12px;}
 .ai-chip{background:var(--gbg);border:1px solid var(--gbd);color:var(--green);font-size:12px;
-         font-weight:700;padding:5px 12px;border-radius:var(--pill);cursor:pointer;
-         font-family:"DM Sans",sans-serif;transition:all .13s;}
-.ai-chip:hover{background:var(--green);color:#fff;}
-.ai-row{display:flex;gap:8px;}
-.ai-input{flex:1;background:var(--s3);border:1.5px solid var(--bd2);border-radius:var(--pill);
-          color:var(--t1);font-family:"DM Sans",sans-serif;font-size:13px;padding:8px 15px;
-          outline:none;transition:border-color .13s;}
+         font-weight:700;padding:7px 12px;border-radius:var(--pill);cursor:pointer;
+         font-family:"DM Sans",sans-serif;transition:all .13s;
+         min-height:34px;display:inline-flex;align-items:center;-webkit-tap-highlight-color:transparent;}
+.ai-chip:hover,.ai-chip:active{background:var(--green);color:#fff;}
+.ai-row{display:flex;gap:8px;align-items:center;}
+.ai-input{
+  flex:1;background:var(--s3);border:1.5px solid var(--bd2);border-radius:var(--pill);
+  color:var(--t1);font-family:"DM Sans",sans-serif;
+  font-size:16px; /* 16px prevents iOS auto-zoom */
+  padding:10px 16px;
+  outline:none;transition:border-color .13s;
+  -webkit-appearance:none;appearance:none;
+  min-height:44px; /* Apple minimum tap target */
+}
 .ai-input:focus{border-color:var(--green);}
-.ai-send{width:36px;height:36px;border-radius:50%;background:var(--green);border:none;cursor:pointer;
-         display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;}
-.ai-send:hover{background:var(--gd);transform:scale(1.08);}
-.ai-send svg{width:14px;height:14px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.ai-send{
+  width:44px;height:44px;border-radius:50%;background:var(--green);border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .15s;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+}
+.ai-send:hover{background:var(--gd);}
+.ai-send:active{background:var(--gd);transform:scale(0.95);}
+.ai-send svg{width:16px;height:16px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+@media(max-width:600px){
+  .ai-msgs{max-height:180px;}
+  .ai-chip{font-size:11px;padding:6px 10px;}
+  .ai-hdr>span:last-child{font-size:9px;}
+}
 
 /* ── SHARED INNER COMPONENTS ── */
 .btn{display:inline-flex;align-items:center;gap:6px;padding:8px 18px;border-radius:var(--pill);
@@ -585,14 +601,14 @@ textarea{resize:vertical;min-height:76px;}
         <div class="ai-in">Hello! I'm your AI Compliance Assistant with live web search. Ask me about <strong>Joint Commission</strong>, <strong>DNV</strong>, <strong>OSHA</strong>, <strong>NFPA</strong>, <strong>CMS</strong>, or any healthcare facility safety question. I'll cite the current standards.</div>
       </div>
       <div class="ai-chips">
-        <button class="ai-chip" onclick="dashAI(this)">TJC fire door requirements?</button>
-        <button class="ai-chip" onclick="dashAI(this)">OSHA 300 log requirements</button>
-        <button class="ai-chip" onclick="dashAI(this)">DNV vs TJC differences?</button>
-        <button class="ai-chip" onclick="dashAI(this)">NFPA 99 risk categories</button>
+        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">TJC fire door requirements?</button>
+        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">OSHA 300 log requirements</button>
+        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">DNV vs TJC differences?</button>
+        <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">NFPA 99 risk categories</button>
       </div>
       <div class="ai-row">
-        <input id="ai-input" class="ai-input" type="text" placeholder="Ask about TJC, OSHA, DNV, NFPA, CMS..." onkeydown="if(event.key==='Enter')dashSend()"/>
-        <button class="ai-send" onclick="dashSend()">
+        <input id="ai-input" class="ai-input" type="text" placeholder="Ask about TJC, OSHA, DNV, NFPA, CMS..." inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')dashSend()"/>
+        <button class="ai-send" onclick="dashSend()" ontouchend="event.preventDefault();dashSend()">
           <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
         </button>
       </div>
@@ -1797,6 +1813,7 @@ textarea{resize:vertical;min-height:76px;}
     </div>
     <div style="display:flex;gap:8px;">
       <input id="kb-q-input" class="ai-input" type="text" placeholder="Ask a question about your documents..."
+             inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false"
              onkeydown="if(event.key==='Enter')kbSend()"/>
       <button class="ai-send" onclick="kbSend()">
         <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
