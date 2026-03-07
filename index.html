@@ -360,7 +360,31 @@ textarea{resize:vertical;min-height:76px;}
 .uav{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--green),var(--gd));
   display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;
   font-family:"Nunito",sans-serif;color:#fff;}
-</style>
+
+    .ls-ref { cursor:pointer; transition:all .15s; }
+    .ls-ref:hover { transform:translateY(-1px); }
+    .ref-hd { display:flex; align-items:center; justify-content:space-between; }
+    .ref-hd-left { display:flex; align-items:center; gap:12px; }
+    .ref-ico { width:38px; height:38px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:18px; flex-shrink:0; }
+    .ref-title { font-weight:800; font-size:13px; color:var(--t1); }
+    .ref-sub { font-size:11px; color:var(--t3); margin-top:2px; }
+    .ref-arr { width:16px; height:16px; stroke:var(--t3); fill:none; stroke-width:2; transition:transform .2s; flex-shrink:0; }
+    .ref-body { margin-top:14px; padding-top:14px; border-top:1px solid var(--bd); font-size:12px; color:var(--t2); line-height:1.7; }
+    .ref-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:12px; margin-bottom:14px; }
+    .ref-col { background:var(--s2); border-radius:10px; padding:12px 14px; }
+    .ref-col p { margin:0; }
+    .ref-col-title { font-size:10px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.07em; margin-bottom:6px; }
+    .ref-deficiencies { background:rgba(255,75,75,.07); border:1px solid rgba(255,75,75,.15); border-radius:10px; padding:12px 14px; margin-bottom:12px; }
+    .ref-deficiencies ul { margin:6px 0 0; padding-left:18px; display:flex; flex-direction:column; gap:4px; }
+    .ref-deficiencies li { font-size:12px; color:var(--t2); }
+    .ref-link-row { display:flex; flex-wrap:wrap; gap:8px; }
+    .ref-link { font-size:11px; color:var(--blue); text-decoration:none; font-weight:700; }
+    .ref-link:hover { text-decoration:underline; }
+    .flbl { font-size:11px; font-weight:700; color:var(--t3); text-transform:uppercase; letter-spacing:.07em; }
+    .finp { background:var(--s3); border:1.5px solid var(--bd2); border-radius:10px; color:var(--t1); font-size:13px; padding:9px 12px; outline:none; width:100%; box-sizing:border-box; font-family:inherit; }
+    .finp:focus { border-color:var(--green); }
+    
+  </style>
 </head>
 <body>
 
@@ -461,13 +485,13 @@ textarea{resize:vertical;min-height:76px;}
   <div class="sec-label">Status</div>
   <div class="stat-grid">
 
-    <div class="sc" onclick="showView('rounds')">
+    <div class="sc" id="stat-overdue-card" onclick="openOverdueModal()" style="cursor:pointer;">
       <div class="sc-ico" style="background:var(--rbg);">
         <svg viewBox="0 0 24 24" style="stroke:var(--red)"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
       </div>
       <div class="sc-body">
-        <div class="sc-num" style="color:var(--red)">4</div>
-        <div class="sc-lbl">Overdue</div>
+        <div class="sc-num" style="color:var(--red)" id="stat-overdue">0</div>
+        <div class="sc-lbl">Overdue <span style="font-size:10px;color:var(--t3);">— tap to view</span></div>
       </div>
     </div>
 
@@ -476,7 +500,7 @@ textarea{resize:vertical;min-height:76px;}
         <svg viewBox="0 0 24 24" style="stroke:var(--yellow)"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       </div>
       <div class="sc-body">
-        <div class="sc-num" style="color:var(--yellow)">3</div>
+        <div class="sc-num" style="color:var(--yellow)" id="stat-due30">0</div>
         <div class="sc-lbl">Due in 30 Days</div>
       </div>
     </div>
@@ -486,7 +510,7 @@ textarea{resize:vertical;min-height:76px;}
         <svg viewBox="0 0 24 24" style="stroke:var(--blue)"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></svg>
       </div>
       <div class="sc-body">
-        <div class="sc-num" style="color:var(--blue)">5</div>
+        <div class="sc-num" style="color:var(--blue)" id="stat-due90">0</div>
         <div class="sc-lbl">Due in 90 Days</div>
       </div>
     </div>
@@ -506,7 +530,7 @@ textarea{resize:vertical;min-height:76px;}
         <svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
       </div>
       <div class="sc-body">
-        <div class="sc-num" style="color:var(--red)">1</div>
+        <div class="sc-num" style="color:var(--red)" id="stat-deficiencies">0</div>
         <div class="sc-lbl">With Deficiencies</div>
       </div>
     </div>
@@ -572,29 +596,303 @@ textarea{resize:vertical;min-height:76px;}
 
 <div id="view-safety" class="view">
   <div class="pg-head">
-    <button class="back-btn" onclick="showView('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
-    </button>
+    <button class="back-btn" onclick="showView('dashboard')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back</button>
     <span class="pg-title">Safety</span>
   </div>
-  <div class="empty-state">
-    <div class="empty-ico"><svg viewBox="0 0 24 24" style="stroke:#ff9600"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></div>
-    <p class="empty-title">Coming Soon</p>
-    <p class="empty-hint">This module is under development.</p>
+
+  <!-- Linen Vendor Inspection -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-weight:900;font-size:15px;color:var(--t1);font-family:'Nunito',sans-serif;">Annual Linen Vendor Inspection</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px;">HLAC · OSHA 29 CFR 1910.1030 · Annual</div>
+      </div>
+      <button class="btn btn-green" onclick="openModal('linenVendorModal');openLinenVendorModal();" style="display:flex;align-items:center;gap:6px;">
+        <svg style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Inspection
+      </button>
+    </div>
+    <div id="linen-vendor-log">
+      <div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No linen vendor inspections on record</p><p class="empty-hint">Use the button above to document an annual inspection.</p></div>
+    </div>
+  </div>
+
+  <!-- Safety Meeting Agenda -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div>
+        <div style="font-weight:900;font-size:15px;color:var(--t1);font-family:'Nunito',sans-serif;">Safety Meeting Agenda Tool</div>
+        <div style="font-size:12px;color:var(--t3);margin-top:2px;">Generate, complete, and archive safety committee meeting agendas</div>
+      </div>
+      <button class="btn btn-green" onclick="openModal('safetyMeetingModal')" style="display:flex;align-items:center;gap:6px;">
+        <svg style="width:13px;height:13px;stroke:#fff;fill:none;stroke-width:2;stroke-linecap:round;" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>New Agenda
+      </button>
+    </div>
+    <div id="safety-meeting-log">
+      <div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No meeting agendas on record</p><p class="empty-hint">Use the button above to create an agenda.</p></div>
+    </div>
+  </div>
+
+  <!-- OSHA Reference Cards -->
+  <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">OSHA Quick Reference — Healthcare</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-bbp')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,75,75,.12);">🩸</div><div><div class="ref-title">Bloodborne Pathogens</div><div class="ref-sub">29 CFR 1910.1030 · Annual Training Required</div></div></div><svg id="osha-bbp-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-bbp" class="ref-body" style="display:none;">
+        <p>Requires an Exposure Control Plan, engineering controls (sharps containers, needleless systems), PPE, hepatitis B vaccination offer, post-exposure evaluation, and annual training for all employees with occupational exposure. Healthcare workers most commonly cited for missing written plan, no annual training records, or inadequate sharps disposal.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>No written Exposure Control Plan or not updated annually</li><li>Missing annual training documentation</li><li>Sharps containers overfilled beyond fill line</li><li>No post-exposure evaluation procedure documented</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/bloodborne-pathogens" target="_blank" class="ref-link">🔗 OSHA Bloodborne Pathogens</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-hazcom')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,150,0,.12);">⚗️</div><div><div class="ref-title">Hazard Communication / GHS</div><div class="ref-sub">29 CFR 1910.1200 · SDS & Label Requirements</div></div></div><svg id="osha-hazcom-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-hazcom" class="ref-body" style="display:none;">
+        <p>Requires a written Hazard Communication Program, a current SDS for every hazardous chemical used, GHS-compliant container labels, and employee training on chemical hazards. The SDS library must be accessible to all employees at all times — electronic access is acceptable if always available.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>Missing or outdated SDS for chemicals in use</li><li>Containers without GHS labels or secondary containers unlabeled</li><li>No written Hazard Communication Program</li><li>Employees unable to locate SDS during inspection</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/hazardous-substances" target="_blank" class="ref-link">🔗 OSHA Hazard Communication</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-ppe')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(88,204,2,.12);">🦺</div><div><div class="ref-title">Personal Protective Equipment</div><div class="ref-sub">29 CFR 1910.132 · Hazard Assessment Required</div></div></div><svg id="osha-ppe-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-ppe" class="ref-body" style="display:none;">
+        <p>Requires a written workplace hazard assessment to determine necessary PPE. Employer must provide required PPE at no cost (except everyday clothing, non-specialty safety-toe footwear, and prescription eyewear in certain cases). Employees must be trained on when to use PPE, what PPE is required, how to properly don/doff, limitations, and care/maintenance.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>No documented hazard assessment certification</li><li>PPE not provided for identified hazards</li><li>No training documentation for PPE use</li><li>PPE not maintained in sanitary/reliable condition</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/personal-protective-equipment" target="_blank" class="ref-link">🔗 OSHA PPE Standard</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-loto')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,200,0,.12);">🔒</div><div><div class="ref-title">Lockout / Tagout</div><div class="ref-sub">29 CFR 1910.147 · Energy Control Program</div></div></div><svg id="osha-loto-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-loto" class="ref-body" style="display:none;">
+        <p>Requires an Energy Control Program (written procedures for each piece of equipment), training for authorized and affected employees, and an annual periodic inspection of each energy control procedure. Any time maintenance or service is performed on equipment that could release hazardous energy — LOTO must be applied.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>No written energy control procedures for specific equipment</li><li>Locks and tags not provided to authorized employees</li><li>No annual review of LOTO procedures</li><li>Employees performing maintenance without applying LOTO</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/control-of-hazardous-energy" target="_blank" class="ref-link">🔗 OSHA LOTO Standard</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-falls')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(77,159,255,.12);">🚶</div><div><div class="ref-title">Walking / Working Surfaces — Slips, Trips, Falls</div><div class="ref-sub">29 CFR 1910.22 · Housekeeping & Maintenance</div></div></div><svg id="osha-falls-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-falls" class="ref-body" style="display:none;">
+        <p>Requires all walking and working surfaces to be kept clean, dry, and free of hazards. Aisles and passageways must be marked and kept clear. Wet surfaces must be marked with warning signage. Regular housekeeping and preventive maintenance are the primary compliance tools.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>Cluttered aisles and exits</li><li>Wet floors without wet floor signage</li><li>Damaged floor surfaces not repaired</li><li>Cords across walkways</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/walking-working-surfaces" target="_blank" class="ref-link">🔗 OSHA Walking/Working Surfaces</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-elec')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,200,0,.12);">⚡</div><div><div class="ref-title">Electrical Safety</div><div class="ref-sub">29 CFR 1910.303 · GFCI & Extension Cord Rules</div></div></div><svg id="osha-elec-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-elec" class="ref-body" style="display:none;">
+        <p>Extension cords are for temporary use only — never permanent wiring. GFCI protection required in wet or damp locations. Electrical panels must have 36 inches of clear space in front. Cover plates must be present on all outlets and junction boxes. No daisy-chaining of power strips.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>Extension cords used as permanent wiring</li><li>Daisy-chained power strips</li><li>Blocked electrical panels</li><li>Missing outlet cover plates</li><li>No GFCI in wet areas (kitchens, janitor closets)</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/electrical" target="_blank" class="ref-link">🔗 OSHA Electrical Safety</a></div>
+      </div>
+    </div>
+
+    <div class="panel ls-ref" onclick="toggleRef('osha-recordkeep')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(206,130,255,.12);">📊</div><div><div class="ref-title">Recordkeeping — OSHA 300 Log</div><div class="ref-sub">29 CFR 1904 · Annual Posting Feb 1 – Apr 30</div></div></div><svg id="osha-recordkeep-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="osha-recordkeep" class="ref-body" style="display:none;">
+        <p>Employers with 10 or more employees must maintain OSHA 300 (injury/illness log), 300A (annual summary), and 301 (incident report) forms. The 300A summary must be posted in a visible location from February 1 through April 30 each year. Records must be retained for 5 years.</p>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>300A summary not posted during required period</li><li>Recordable cases not entered within 7 days of knowledge</li><li>Records not retained for 5-year minimum</li><li>Unsigned 300A (must be signed by company executive)</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/recordkeeping" target="_blank" class="ref-link">🔗 OSHA Recordkeeping</a>&nbsp;&nbsp;<a href="https://www.osha.gov/healthcare" target="_blank" class="ref-link">🔗 OSHA Healthcare eTool</a></div>
+      </div>
+    </div>
+
   </div>
 </div>
-
 <div id="view-security" class="view">
   <div class="pg-head">
-    <button class="back-btn" onclick="showView('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
-    </button>
+    <button class="back-btn" onclick="showView('dashboard')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back</button>
     <span class="pg-title">Security</span>
   </div>
-  <div class="empty-state">
-    <div class="empty-ico"><svg viewBox="0 0 24 24" style="stroke:#4d9fff"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
-    <p class="empty-title">Coming Soon</p>
-    <p class="empty-hint">This module is under development.</p>
+
+  <!-- Primary Action Button -->
+  <button class="big-action-btn" onclick="openModal('secIncidentModal')" style="background:var(--red);color:#fff;border:none;border-radius:16px;padding:18px 32px;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:28px;box-shadow:0 4px 20px rgba(255,75,75,.3);transition:all .2s;">
+    <svg viewBox="0 0 24 24" style="width:24px;height:24px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg>
+    Record Security Incident
+  </button>
+
+  <!-- Incident Log -->
+  <div class="panel" style="margin-bottom:20px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div class="panel-title" style="margin:0;">Incident Log</div>
+      <div style="display:flex;gap:8px;">
+        <input type="text" id="sec-search" placeholder="Search incidents..." oninput="renderSecIncidents()" style="background:var(--s3);border:1.5px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:12px;padding:6px 12px;outline:none;width:180px;"/>
+        <select id="sec-filter-type" onchange="renderSecIncidents()" style="background:var(--s3);border:1.5px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:12px;padding:6px 10px;outline:none;">
+          <option value="">All Types</option>
+          <option>Theft</option><option>Trespassing</option><option>Physical Altercation</option>
+          <option>Verbal Threat</option><option>Elopement</option><option>Unauthorized Access</option>
+          <option>Property Damage</option><option>Suspicious Person</option><option>Other</option>
+        </select>
+      </div>
+    </div>
+    <div id="sec-incident-list">
+      <div class="empty-state" style="padding:30px 0;">
+        <p class="empty-title" style="font-size:14px;">No incidents recorded yet</p>
+        <p class="empty-hint">Use the button above to record the first incident.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Reference Cards -->
+  <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Security References</div>
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;">
+
+    <div class="panel" style="cursor:pointer;" onclick="toggleSecRef('ref-wv')">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,150,0,.12);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--orange);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--t1);">Workplace Violence Prevention</div>
+            <div style="font-size:11px;color:var(--t3);">De-escalation &amp; Reporting</div>
+          </div>
+        </div>
+        <svg id="ref-wv-arrow" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ref-wv" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;">
+          <div style="font-weight:700;color:var(--t1);margin-bottom:6px;">Key Principles</div>
+          <p>Workplace violence in healthcare settings includes physical assaults, verbal threats, and harassment from patients, visitors, or coworkers. Prevention requires a zero-tolerance policy backed by reporting mechanisms and training.</p>
+          <div style="font-weight:700;color:var(--t1);margin:10px 0 6px;">De-Escalation Techniques (CPI Principles)</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>Maintain calm, non-threatening body language — stay at eye level</li>
+            <li>Use a low, steady voice; avoid arguing or raising your voice</li>
+            <li>Acknowledge feelings: "I can see you're frustrated"</li>
+            <li>Offer limited, concrete choices to restore sense of control</li>
+            <li>Never turn your back — maintain awareness of exits</li>
+            <li>Call for assistance early; do not try to manage alone if escalating</li>
+          </ul>
+          <div style="font-weight:700;color:var(--t1);margin:10px 0 6px;">Reporting Obligations</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>All violent incidents must be reported via this module and facility incident reporting system</li>
+            <li>OSHA requires recording qualifying incidents on the 300 Log</li>
+            <li>Law enforcement contact is required for physical assaults — document case number</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="cursor:pointer;" onclick="toggleSecRef('ref-cp')">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(255,75,75,.12);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--red);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--t1);">Code Pink — Infant/Child Abduction</div>
+            <div style="font-size:11px;color:var(--t3);">Response Steps &amp; Lockdown</div>
+          </div>
+        </div>
+        <svg id="ref-cp-arrow" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ref-cp" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;">
+          <div style="font-weight:700;color:var(--red);margin-bottom:8px;">IMMEDIATE RESPONSE STEPS</div>
+          <ol style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;">
+            <li><strong>Announce</strong> Code Pink overhead and via radio — include description of missing child and last known location</li>
+            <li><strong>Lock down</strong> all exits immediately — station staff at every door; no one exits without authorization</li>
+            <li><strong>Search</strong> the immediate area — check closets, bathrooms, stairwells, vehicles if applicable</li>
+            <li><strong>Call 911</strong> immediately — do not delay for internal investigation</li>
+            <li><strong>Notify</strong> administration, security supervisor, and risk management</li>
+            <li><strong>Preserve</strong> any surveillance footage — do not erase or record over</li>
+            <li><strong>Document</strong> everything — times, who was notified, search areas cleared</li>
+          </ol>
+          <div style="font-weight:700;color:var(--t1);margin:10px 0 6px;">Communication Checklist</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>Overhead PA announcement made</li>
+            <li>911 contacted — case number documented</li>
+            <li>Administrator on call notified</li>
+            <li>Risk management notified</li>
+            <li>Parents/guardians notified by appropriate staff</li>
+            <li>All-clear announced only by designated authority</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="cursor:pointer;" onclick="toggleSecRef('ref-at')">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(206,130,255,.12);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--purple);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--t1);">Active Threat — Run, Hide, Fight</div>
+            <div style="font-size:11px;color:var(--t3);">Code Silver Response</div>
+          </div>
+        </div>
+        <svg id="ref-at-arrow" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ref-at" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px;">
+            <div style="background:var(--s3);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">🏃</div>
+              <div style="font-weight:900;color:var(--green);font-size:13px;">RUN</div>
+              <div style="font-size:11px;margin-top:4px;">Evacuate if a safe path exists. Leave belongings. Help others escape if possible.</div>
+            </div>
+            <div style="background:var(--s3);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">🫷</div>
+              <div style="font-weight:900;color:var(--yellow);font-size:13px;">HIDE</div>
+              <div style="font-size:11px;margin-top:4px;">Find a room, lock/barricade the door, silence phones, stay out of sight.</div>
+            </div>
+            <div style="background:var(--s3);border-radius:10px;padding:12px;text-align:center;">
+              <div style="font-size:22px;margin-bottom:4px;">✊</div>
+              <div style="font-weight:900;color:var(--red);font-size:13px;">FIGHT</div>
+              <div style="font-size:11px;margin-top:4px;">Last resort only. Act aggressively, improvise weapons, commit fully.</div>
+            </div>
+          </div>
+          <div style="font-weight:700;color:var(--t1);margin-bottom:6px;">When Law Enforcement Arrives</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>Keep hands visible and empty — do not point or make sudden movements</li>
+            <li>Follow all instructions immediately</li>
+            <li>Do not stop officers to ask questions — exit as directed</li>
+            <li>Once safe, call 911 to report your location and status</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel" style="cursor:pointer;" onclick="toggleSecRef('ref-vm')">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:36px;height:36px;border-radius:10px;background:rgba(77,159,255,.12);display:flex;align-items:center;justify-content:center;">
+            <svg viewBox="0 0 24 24" style="width:18px;height:18px;stroke:var(--blue);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          </div>
+          <div>
+            <div style="font-weight:800;font-size:13px;color:var(--t1);">Visitor Management Policy</div>
+            <div style="font-size:11px;color:var(--t3);">Badge, Escort &amp; Restricted Areas</div>
+          </div>
+        </div>
+        <svg id="ref-vm-arrow" viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--t3);fill:none;stroke-width:2;transition:transform .2s;"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ref-vm" style="display:none;margin-top:14px;padding-top:14px;border-top:1px solid var(--bd);">
+        <div style="font-size:12px;color:var(--t2);line-height:1.7;">
+          <div style="font-weight:700;color:var(--t1);margin-bottom:6px;">Badge Requirements</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>All visitors must sign in at the front desk and receive a dated visitor badge</li>
+            <li>Badges must be visible at all times while on facility property</li>
+            <li>Badges are non-transferable and expire at end of visit or end of day</li>
+          </ul>
+          <div style="font-weight:700;color:var(--t1);margin:10px 0 6px;">Escort Procedures</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>Visitors in clinical or restricted areas must be escorted by a staff member at all times</li>
+            <li>Contractors must check in with facilities before proceeding to work areas</li>
+            <li>Unescorted visitors observed in restricted areas should be politely redirected and reported</li>
+          </ul>
+          <div style="font-weight:700;color:var(--t1);margin:10px 0 6px;">Restricted Areas</div>
+          <ul style="margin:0;padding-left:18px;display:flex;flex-direction:column;gap:4px;">
+            <li>Pharmacy, OR, ICU, server rooms, mechanical spaces, and security offices require prior authorization</li>
+            <li>Signage must clearly identify restricted areas</li>
+            <li>Any unauthorized person in a restricted area — contact security immediately</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
 
@@ -628,33 +926,132 @@ textarea{resize:vertical;min-height:76px;}
 
 <div id="view-hazmat" class="view">
   <div class="pg-head">
-    <button class="back-btn" onclick="showView('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
-    </button>
+    <button class="back-btn" onclick="showView('dashboard')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back</button>
     <span class="pg-title">Hazardous Materials</span>
   </div>
-  <div class="empty-state">
-    <div class="empty-ico"><svg viewBox="0 0 24 24" style="stroke:#ffc800"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
-    <p class="empty-title">Coming Soon</p>
-    <p class="empty-hint">This module is under development.</p>
+
+  <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Regulatory Reference Modules</div>
+  <div style="display:flex;flex-direction:column;gap:10px;">
+
+    <!-- DOT Hazardous Waste -->
+    <div class="panel ls-ref" onclick="toggleRef('hm-dot')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,150,0,.12);">🚛</div><div><div class="ref-title">DOT Hazardous Waste Transportation</div><div class="ref-sub">49 CFR Parts 171–180 · Generator Training Required</div></div></div><svg id="hm-dot-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="hm-dot" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Generator Status</div><p><strong>VSQG:</strong> ≤100 kg/month · <strong>SQG:</strong> 100–1,000 kg/month · <strong>LQG:</strong> &gt;1,000 kg/month. Status determines storage time limits and reporting requirements.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Training Requirement</div><p>All employees who prepare, handle, or offer hazardous materials for transport must have DOT hazmat training. Refresher every 3 years. Records retained 3 years after employment ends.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Manifest Requirements</div><p>Uniform Hazardous Waste Manifest (EPA Form 8700-22) required for off-site transport. Generator retains copy for 3 years minimum.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Common Healthcare Waste</div><p>Chemotherapy waste · Mercury devices · Batteries · Fluorescent lamps · Aerosols · Photographic chemicals</p></div>
+        </div>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>Employees handling hazmat shipments without documented DOT training</li><li>Missing or incomplete shipping papers</li><li>Improper labeling or marking of containers</li><li>Manifests not retained for required period</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.phmsa.dot.gov/hazmat/training" target="_blank" class="ref-link">🔗 DOT PHMSA Training Resources</a>&nbsp;&nbsp;<a href="https://www.epa.gov/hw/hazardous-waste-generator-regulations" target="_blank" class="ref-link">🔗 EPA Generator Regulations</a></div>
+      </div>
+    </div>
+
+    <!-- Pharmacy Waste -->
+    <div class="panel ls-ref" onclick="toggleRef('hm-pharma')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(206,130,255,.12);">💊</div><div><div class="ref-title">Pharmacy Waste Management</div><div class="ref-sub">EPA RCRA · DEA Controlled Substance Waste</div></div></div><svg id="hm-pharma-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="hm-pharma" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Container Color Guide</div><p><strong>Blue lid:</strong> Non-hazardous pharmaceutical waste · <strong>Yellow lid:</strong> Hazardous pharmaceutical waste (P-listed and U-listed) · <strong>Black lid:</strong> RCRA hazardous waste</p></div>
+          <div class="ref-col"><div class="ref-col-title">P-Listed Waste</div><p>Acutely hazardous pharmaceuticals — must be handled as RCRA P-listed waste. Examples: warfarin (if &gt;0.3%), physostigmine, epinephrine. Strict storage limits apply.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Controlled Substance Waste</div><p>DEA Form 41 for destruction on-site. Reverse distributors require DEA Form 222. Authorized witness and documentation required. No drain disposal of controlled substances.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Sharps Waste</div><p>Proper sharps containers required. Vendor pickup with manifest. Never overfill containers. Trace chemo sharps go into chemo sharps containers — not regular sharps.</p></div>
+        </div>
+        <div class="ref-deficiencies"><div class="ref-col-title">Common Violations</div><ul><li>Wrong container color — hazardous waste in non-haz container</li><li>Controlled substance disposal without proper DEA documentation</li><li>P-listed waste stored beyond 1-year time limit (SQG/LQG)</li><li>Drain disposal of pharmaceuticals</li></ul></div>
+        <div class="ref-link-row"><a href="https://www.epa.gov/hwgenerators/management-standards-hazardous-waste-pharmaceuticals" target="_blank" class="ref-link">🔗 EPA Pharmaceutical Waste Final Rule</a></div>
+      </div>
+    </div>
+
+    <!-- SDS Management -->
+    <div class="panel ls-ref" onclick="toggleRef('hm-sds')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(77,159,255,.12);">📄</div><div><div class="ref-title">SDS (Safety Data Sheet) Management</div><div class="ref-sub">GHS 16-Section Format · Must Be Accessible at All Times</div></div></div><svg id="hm-sds-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="hm-sds" class="ref-body" style="display:none;">
+        <p>An SDS must exist for every hazardous chemical in the workplace and must be immediately accessible to employees in their work area during their shift. Electronic access is permitted if employees have unimpeded access at all times. The 16-section GHS format is required for all new SDSs.</p>
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Key SDS Sections</div><p>§1 Identification · §2 Hazard ID · §4 First Aid · §5 Firefighting · §6 Accidental Release · §8 Exposure Controls/PPE · §11 Toxicology · §13 Disposal</p></div>
+          <div class="ref-col"><div class="ref-col-title">Maintenance</div><p>Keep SDS current — update when formulations change. Remove SDSs for chemicals no longer in use. Know how to request an SDS from a vendor if one is missing.</p></div>
+        </div>
+        <div class="ref-link-row"><a href="https://www.osha.gov/hazardous-substances/sds" target="_blank" class="ref-link">🔗 OSHA SDS Guide</a></div>
+      </div>
+    </div>
+
+    <!-- Spill Response -->
+    <div class="panel ls-ref" onclick="toggleRef('hm-spill')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(255,75,75,.12);">⚠️</div><div><div class="ref-title">Spill Response Procedures</div><div class="ref-sub">Tiered Response — Know Your Level</div></div></div><svg id="hm-spill-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="hm-spill" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Level 1 — Staff Cleanup</div><p>Small spill of known, non-hazardous substance. Staff trained to clean up using standard spill kit. PPE per SDS. Document in incident log.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Level 2 — Hazmat Team</div><p>Large spill, unknown substance, or any amount of chemotherapy or hazardous pharmaceutical. Evacuate area. Call Hazmat/EHS. Announce Code Orange if warranted. Do not attempt cleanup.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Spill Kit Locations</div><p>Identify and document spill kit locations in your facility. Staff must know where kits are. Inspect kits quarterly for contents and expiration.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Chemo Spill Special Rules</div><p>Any amount of chemotherapy spill requires chemo spill kit — not standard spill kit. Two-person cleanup minimum. Double-bag all waste in yellow chemo waste containers. Document exposure.</p></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compressed Gas -->
+    <div class="panel ls-ref" onclick="toggleRef('hm-gas')">
+      <div class="ref-hd"><div class="ref-hd-left"><div class="ref-ico" style="background:rgba(88,204,2,.12);">🫙</div><div><div class="ref-title">Compressed Gas Cylinder Safety</div><div class="ref-sub">Storage · Handling · Transport · Disposal</div></div></div><svg id="hm-gas-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg></div>
+      <div id="hm-gas" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Storage Rules</div><p>Cylinders must be secured upright with chains or straps at all times. Full and empty cylinders stored separately. Oxygen cylinders stored at least 20 feet from flammable gas cylinders or combustibles, or separated by a 5-foot non-combustible wall.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Transport</div><p>Always use an approved hand truck or cart designed for cylinders. Never roll, drag, or carry cylinders horizontally. Valve protection cap must be in place during transport. Never transport in an enclosed vehicle.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Handling</div><p>Open valves slowly. Never use cylinders as rollers or supports. Never drop or strike cylinders. Legibly mark all empty cylinders "MT" or "Empty." Remove regulators before storage or transport.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Disposal</div><p>Return empty cylinders to the vendor. Never attempt to refill, repair, or dispose of cylinders in regular waste. Cylinders with damaged valves should be set aside and vendor notified immediately.</p></div>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
-
 <div id="view-emergency" class="view">
   <div class="pg-head">
-    <button class="back-btn" onclick="showView('dashboard')">
-      <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
-    </button>
+    <button class="back-btn" onclick="showView('dashboard')"><svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back</button>
     <span class="pg-title">Emergency Management</span>
   </div>
-  <div class="empty-state">
-    <div class="empty-ico"><svg viewBox="0 0 24 24" style="stroke:#ff4b4b"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
-    <p class="empty-title">Coming Soon</p>
-    <p class="empty-hint">This module is under development.</p>
-  </div>
-</div>
 
-<div id="view-inspections" class="view">
+  <!-- Primary Action Button -->
+  <button class="big-action-btn" onclick="openFlipChart()" style="background:linear-gradient(135deg,#ff4b4b,#c0392b);color:#fff;border:none;border-radius:16px;padding:18px 32px;font-family:'Nunito',sans-serif;font-weight:900;font-size:18px;cursor:pointer;display:flex;align-items:center;gap:12px;margin-bottom:28px;box-shadow:0 4px 24px rgba(255,75,75,.35);transition:all .2s;width:fit-content;">
+    <svg viewBox="0 0 24 24" style="width:26px;height:26px;stroke:#fff;fill:none;stroke-width:2.5;stroke-linecap:round;stroke-linejoin:round;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+    Open Emergency Response Guide
+  </button>
+
+  <!-- Quick Reference Cards Grid -->
+  <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Emergency Codes — Quick Reference</div>
+  <div id="em-code-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin-bottom:28px;"></div>
+
+  <!-- Coming Soon sections placeholder -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">
+    <div class="panel" style="opacity:.55;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(77,159,255,.12);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--blue);fill:none;stroke-width:2;"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>
+        <div style="font-weight:800;font-size:13px;color:var(--t1);">IAP Quick Start</div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);">ICS-based Incident Action Plan builder — Coming soon</div>
+    </div>
+    <div class="panel" style="opacity:.55;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(255,200,0,.12);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--yellow);fill:none;stroke-width:2;"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><path d="M12 9v4M12 17h.01"/></svg></div>
+        <div style="font-weight:800;font-size:13px;color:var(--t1);">HVA Tool</div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);">Kaiser Permanente Hazard Vulnerability Analysis — Coming soon</div>
+    </div>
+    <div class="panel" style="opacity:.55;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(88,204,2,.12);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--green);fill:none;stroke-width:2;"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg></div>
+        <div style="font-weight:800;font-size:13px;color:var(--t1);">Drill Management</div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);">Schedule, track, and document emergency drills — Coming soon</div>
+    </div>
+    <div class="panel" style="opacity:.55;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:32px;height:32px;border-radius:8px;background:rgba(206,130,255,.12);display:flex;align-items:center;justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:var(--purple);fill:none;stroke-width:2;"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></svg></div>
+        <div style="font-weight:800;font-size:13px;color:var(--t1);">EOP Reference Hub</div>
+      </div>
+      <div style="font-size:12px;color:var(--t3);">Upload &amp; index your Emergency Operations Plan — Coming soon</div>
+    </div>
+  </div>
+</div><div id="view-inspections" class="view">
   <div class="pg-head">
     <button class="back-btn" onclick="showView('dashboard')">
       <svg viewBox="0 0 24 24"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>Back
@@ -1522,6 +1919,9 @@ function showView(v){
   if(v==='training'){renderTraining();updateTrainingStats();}
   if(v==='lifesafety')renderPlans();
   if(v==='rounds'){initRounds();}
+  if(v==='emergency'){renderEmCodeGrid();}
+  if(v==='security'){renderSecIncidents();}
+  if(v==='safety'){renderLinenLog();renderSafetyMeetingLog();}
   if(v==='settings')loadSettings();
   buildModule(v);
 }
@@ -1925,10 +2325,11 @@ function openCert(sid,idx){
 function printCert(){
   var content=document.getElementById('cert-preview').outerHTML;
   var w=window.open('','_blank');
-  w.document.write('<html><head><style>body{margin:40px;font-family:Georgia,serif;}</style></head><body>'+content+'</body></html>');
+  w.document.write('<html><head><style>body{margin:40px;font-family:Georgia,serif;}</style></head><body>'+content+'<\/body><\/html>');
   w.document.close();
   setTimeout(function(){w.print();},400);
 }
+
 
 function renderAllAttendees(){
   var el=document.getElementById('all-attendees-panel');if(!el)return;
@@ -3061,6 +3462,455 @@ async function submitRoundAndEmail(){
   showToast('Email client opened','success');
 }
 
+
+/* ══════════════════════════════════════════════════════════════
+   EMERGENCY CODES DATA
+══════════════════════════════════════════════════════════════ */
+var EMERGENCY_CODES = [
+  {
+    code:'Code Red', color:'#ff4b4b', icon:'🔴',
+    title:'Fire',
+    steps:['Activate the nearest fire alarm pull station','Call 911 — announce Code Red overhead','R.A.C.E: Rescue anyone in immediate danger','A.C.E: Alarm, Contain (close doors), Extinguish or Evacuate','Direct visitors/staff away from the area','Do not use elevators','Account for all patients and staff at assembly point'],
+    notify:['Charge nurse / Supervisor','Administration on call','Facilities/Engineering','Security'],
+    resources:['Fire extinguishers (ABC class) — 75-ft travel max','Manual pull stations at each corridor exit','Fire alarm panel — main lobby','Evacuation maps — posted at each exit']
+  },
+  {
+    code:'Code Blue', color:'#4d9fff', icon:'🔵',
+    title:'Cardiac / Medical Emergency',
+    steps:['Call out "Code Blue" and activate the overhead page with location','Call 911 if no in-house code team','Begin CPR if patient is unresponsive and not breathing','Retrieve AED — apply as soon as available','Send someone to meet EMS at entrance','Clear the room of non-essential personnel','Assign one person to document times and interventions'],
+    notify:['Charge nurse / Supervisor immediately','Provider on call','Administration on call'],
+    resources:['AED locations — marked on facility map','Crash cart — nursing station','BLS/ACLS supplies — medication room']
+  },
+  {
+    code:'Code Gray', color:'#6e7690', icon:'⚫',
+    title:'Combative Person / Security Threat',
+    steps:['Do NOT physically restrain unless trained and necessary for safety','Maintain calm voice — use de-escalation techniques','Create distance — do not corner the individual','Call security immediately — announce Code Gray with location','Clear bystanders from area','If weapon is involved: retreat, shelter in place, call 911','Document all actions and statements after incident is resolved'],
+    notify:['Security immediately','Supervisor / Charge nurse','Administration on call','Law enforcement if weapon or imminent threat'],
+    resources:['Security office — direct line','Panic buttons — nursing stations and security-designated areas','CPI de-escalation reference card']
+  },
+  {
+    code:'Code Pink', color:'#ff69b4', icon:'🩷',
+    title:'Infant / Child Abduction',
+    steps:['Announce Code Pink overhead with description and last known location','Lock down ALL exits immediately — no one leaves without authorization','Station staff at every door and stairwell','Call 911 — do not delay','Search immediate area: closets, bathrooms, stairwells, vehicles','Preserve all surveillance footage — do not record over','Notify administration and risk management','All-clear only by designated authority after law enforcement confirms'],
+    notify:['911 immediately','Administrator on call','Risk management','Security supervisor'],
+    resources:['Surveillance system — security office','Lock-down procedures — posted at each exit','Incident report form — this module']
+  },
+  {
+    code:'Code Orange', color:'#ff9600', icon:'🟠',
+    title:'Hazmat / Chemical Spill',
+    steps:['Evacuate the immediate spill area — remove all personnel','Confine the area — close doors, shut HVAC if possible','Do NOT attempt cleanup unless trained for the specific chemical','Call 911 and request Hazmat response if large or unknown spill','Identify the substance using SDS library if safe to do so','Account for any exposure victims — initiate first aid/decon if needed','Notify facilities and safety officer'],
+    notify:['911 / Local Fire Department Hazmat','Supervisor / Charge nurse','Safety Officer / Facilities','Administration on call'],
+    resources:['SDS library — Knowledge Base','Spill kits — housekeeping closets and lab areas','PPE — per SDS requirements']
+  },
+  {
+    code:'Code Black', color:'#1e2333', icon:'⬛',
+    title:'Bomb Threat',
+    steps:['If by phone: keep caller talking — use bomb threat checklist to gather details (exact words, location, time, caller voice, background noises)','Do NOT use cell phones or radios near suspected device','Do NOT touch or move any suspicious item','Evacuate the area and call 911 — give exact location','Do not announce "bomb" over PA — use Code Black','Await law enforcement clearance before re-entry','Document everything — caller ID, exact time, words used'],
+    notify:['911 immediately','Administration on call','Security','Do NOT use intercoms near threat area'],
+    resources:['Bomb threat checklist — posted near main phones','Evacuation assembly areas — exterior facility map']
+  },
+  {
+    code:'Code Silver', color:'#ce82ff', icon:'🔫',
+    title:'Active Shooter / Weapon on Premises',
+    steps:['RUN: Evacuate if a safe path exists — leave belongings, help others if safe','HIDE: Lock/barricade door, silence phone, turn off lights, stay low','FIGHT: Last resort — act aggressively, use improvised weapons, commit fully','Call 911 when safe — give location, description of threat','Do NOT sound fire alarm — it causes people to evacuate into danger','When law enforcement arrives: hands visible, follow all commands, do not point'],
+    notify:['911 — give location and description','Do NOT use overhead PA','Administration only after 911'],
+    resources:['Lockdown procedures — posted at each exit','Run-Hide-Fight reference card — Security module']
+  },
+  {
+    code:'Code White', color:'#a0b0cc', icon:'🌪️',
+    title:'Severe Weather / Tornado',
+    steps:['Monitor weather alerts — NOAA radio or weather app','When warning issued: announce Code White overhead','Move patients and staff to interior corridors — lowest floor available','Move away from windows, glass, and exterior walls','Do NOT use elevators','Shelter in place until all-clear from official source','Account for all patients and staff post-event'],
+    notify:['Charge nurse / Supervisor','Administration on call','Facilities (for post-event damage assessment)'],
+    resources:['NOAA weather radio — facilities office','Shelter-in-place areas — marked on facility map','Flashlights and emergency supplies — designated cache locations']
+  },
+  {
+    code:'Code Yellow', color:'#ffc800', icon:'🟡',
+    title:'Missing Patient / Elopement',
+    steps:['Search the immediate area first: bathrooms, waiting areas, stairwells, exits','Announce Code Yellow overhead with patient description (no name — HIPAA)','Assign staff to all exits immediately','Call 911 if patient is a danger to self or others or cannot be located quickly','Notify family/guardian when appropriate','Document all search activities with times','Complete incident report upon resolution'],
+    notify:['Charge nurse / Supervisor','Administration on call','Security','Law enforcement if patient is at-risk and not located within 30 minutes'],
+    resources:['Incident report form — this module','Visitor/patient log at front desk','Surveillance system — security office']
+  },
+  {
+    code:'Utility Failure', color:'#ff9600', icon:'⚡',
+    title:'Power / Water / HVAC Failure',
+    steps:['POWER: Verify generator auto-transfer — check critical areas first (OR, ICU, pharmacy)','POWER: If generator fails, activate downtime procedures, notify biomedical','WATER: Identify affected areas, notify infection control, activate water contingency plan','HVAC: Assess temperature in critical areas, notify facilities and infection control immediately','Document time of failure and all affected systems','Communicate status updates to clinical leadership every 30 minutes','Contact utility provider and record estimated restoration time'],
+    notify:['Facilities / Engineering immediately','Administrator on call','Clinical leadership (for patient safety assessment)','Utility provider'],
+    resources:['Generator test log — Rounds module','Emergency utility contacts — EOP Resource section','Downtime procedures — posted at nursing stations']
+  },
+  {
+    code:'Mass Casualty', color:'#ff4b4b', icon:'🚑',
+    title:'Mass Casualty Incident (MCI)',
+    steps:['Activate facility MCI plan — notify Administrator on call','Set up command structure: Incident Commander, Medical Branch, Logistics','Notify local hospitals and EMS for mutual aid coordination','Expand capacity: discharge stable patients, open overflow areas','Activate Hospital Incident Command System (HICS)','Assign staff to triage, treatment, and family reception areas','Maintain communication log — document all decisions and times'],
+    notify:['911 and local EMS','Administrator on call — activate MCI plan','Regional hospital coalition','All department supervisors'],
+    resources:['MCI plan — EOP Reference Hub','HICS position cards — Emergency Management binder','Surge capacity areas — identified in EOP']
+  },
+  {
+    code:'IT / Cyber Incident', color:'#4d9fff', icon:'💻',
+    title:'IT / Cyber Incident',
+    steps:['Do NOT attempt to fix or investigate the issue yourself','Disconnect affected devices from network if safe to do so','Do NOT turn off computers — preserve evidence','Notify IT immediately with exact description of the issue','Activate downtime procedures for affected clinical systems','Do not pay any ransom demand without legal/leadership authorization','Document everything: what was seen, when, on which device'],
+    notify:['IT department immediately','Administrator on call','CISO or IT Security lead','Potentially FBI Cyber Division and HHS OCR (if PHI involved)'],
+    resources:['Downtime binders — nursing stations','IT emergency contact — facilities board','Cyber incident response plan — EOP Reference Hub']
+  },
+  {
+    code:'Evacuation', color:'#58cc02', icon:'🚪',
+    title:'Partial or Full Evacuation',
+    steps:['Identify evacuation type: Horizontal (same floor), Vertical (other floor), or Full external','Announce overhead per facility protocol','Designate assembly areas — staff must know these in advance','Assign staff to assist non-ambulatory patients — use approved patient movement equipment','Account for ALL patients and staff at assembly area','Do NOT use elevators unless specifically authorized','Notify receiving facilities if external evacuation of patients required'],
+    notify:['Charge nurse / Supervisor','Administrator on call','Receiving facilities (if full evacuation)','Local EMS for patient transport assistance'],
+    resources:['Evacuation maps — posted at all exits','Patient movement equipment — hallway closets','External assembly areas — marked on site map']
+  }
+];
+
+var _fcIndex = 0;
+
+function openFlipChart(){
+  _fcIndex = 0;
+  openModal('flipChartModal');
+  renderFlipCard();
+  // Render mini grid in Emergency view
+  renderEmCodeGrid();
+}
+
+function closeFlipChart(){
+  closeModal('flipChartModal');
+}
+
+function renderFlipCard(){
+  var c = EMERGENCY_CODES[_fcIndex];
+  if(!c) return;
+  var badge = document.getElementById('fc-code-badge');
+  var title = document.getElementById('fc-title');
+  var content = document.getElementById('fc-content');
+  var counter = document.getElementById('fc-counter');
+  if(badge){ badge.textContent = c.code; badge.style.background = c.color+'22'; badge.style.color = c.color; badge.style.border = '1.5px solid '+c.color+'44'; }
+  if(title) title.textContent = c.icon + ' ' + c.title;
+  if(counter) counter.textContent = (_fcIndex+1) + ' / ' + EMERGENCY_CODES.length;
+  if(content){
+    var h = '';
+    h += '<div style="margin-bottom:18px;">';
+    h += '<div style="font-size:11px;font-weight:700;color:'+c.color+';text-transform:uppercase;letter-spacing:.07em;margin-bottom:10px;">Response Steps</div>';
+    h += '<ol style="margin:0;padding-left:20px;display:flex;flex-direction:column;gap:7px;">';
+    c.steps.forEach(function(s){ h += '<li style="color:var(--t1);"><span style="color:var(--t2);">'+s+'</span></li>'; });
+    h += '</ol></div>';
+    h += '<div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;">';
+    h += '<div style="background:var(--s2);border-radius:12px;padding:14px;">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Notify</div>';
+    h += '<ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px;">';
+    c.notify.forEach(function(n){ h += '<li style="font-size:12px;color:var(--t2);">'+n+'</li>'; });
+    h += '</ul></div>';
+    h += '<div style="background:var(--s2);border-radius:12px;padding:14px;">';
+    h += '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:8px;">Resources</div>';
+    h += '<ul style="margin:0;padding-left:16px;display:flex;flex-direction:column;gap:5px;">';
+    c.resources.forEach(function(r){ h += '<li style="font-size:12px;color:var(--t2);">'+r+'</li>'; });
+    h += '</ul></div>';
+    h += '</div>';
+    content.innerHTML = h;
+  }
+}
+
+function fcNext(){
+  _fcIndex = (_fcIndex + 1) % EMERGENCY_CODES.length;
+  renderFlipCard();
+}
+function fcPrev(){
+  _fcIndex = (_fcIndex - 1 + EMERGENCY_CODES.length) % EMERGENCY_CODES.length;
+  renderFlipCard();
+}
+
+function renderEmCodeGrid(){
+  var grid = document.getElementById('em-code-grid');
+  if(!grid) return;
+  grid.innerHTML = '';
+  EMERGENCY_CODES.forEach(function(c, i){
+    var div = document.createElement('div');
+    div.className = 'panel';
+    div.style.cssText = 'cursor:pointer;border-left:3px solid '+c.color+';padding:12px 14px;transition:all .15s;';
+    div.onmouseenter = function(){ this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 20px rgba(0,0,0,.2)'; };
+    div.onmouseleave = function(){ this.style.transform=''; this.style.boxShadow=''; };
+    div.onclick = function(){ _fcIndex=i; openModal('flipChartModal'); renderFlipCard(); };
+    div.innerHTML = '<div style="display:flex;align-items:center;gap:8px;">'
+      + '<span style="font-size:20px;">'+c.icon+'</span>'
+      + '<div><div style="font-weight:800;font-size:12px;color:var(--t1);">'+c.code+'</div>'
+      + '<div style="font-size:11px;color:var(--t3);">'+c.title+'</div></div></div>';
+    grid.appendChild(div);
+  });
+}
+
+function toggleSecRef(id){
+  var el = document.getElementById(id);
+  var arrow = document.getElementById(id+'-arrow');
+  if(!el) return;
+  var open = el.style.display !== 'none';
+  el.style.display = open ? 'none' : 'block';
+  if(arrow) arrow.style.transform = open ? '' : 'rotate(180deg)';
+}
+
+/* ══════════════════════════════════════════════════════════════
+   SECURITY INCIDENT FUNCTIONS
+══════════════════════════════════════════════════════════════ */
+var SEC_INCIDENTS = [];
+
+function toggleLawCase(){
+  var val = document.getElementById('si-law').value;
+  var wrap = document.getElementById('si-case-wrap');
+  if(wrap) wrap.style.display = val==='yes' ? 'flex' : 'none';
+}
+
+function saveSecIncident(){
+  var date = document.getElementById('si-date').value;
+  var time = document.getElementById('si-time').value;
+  var location = document.getElementById('si-location').value;
+  var type = document.getElementById('si-type').value;
+  var narrative = document.getElementById('si-narrative').value;
+  var submitted = document.getElementById('si-submitted').value;
+  if(!date||!type||!narrative){
+    showToast('Please fill in Date, Type, and Narrative','error');
+    return;
+  }
+  var incident = {
+    id: 'SI-'+Date.now(),
+    date: date, time: time, location: location, type: type,
+    persons: document.getElementById('si-persons').value,
+    witness: document.getElementById('si-witness').value,
+    narrative: narrative,
+    lawEnforcement: document.getElementById('si-law').value,
+    caseNumber: document.getElementById('si-case').value,
+    adminNotified: document.getElementById('si-admin').value,
+    followup: document.getElementById('si-followup').value,
+    submittedBy: submitted,
+    created: new Date().toISOString()
+  };
+  SEC_INCIDENTS.unshift(incident);
+  closeModal('secIncidentModal');
+  // Clear form
+  ['si-date','si-time','si-location','si-type','si-persons','si-witness','si-narrative','si-case','si-followup','si-submitted'].forEach(function(id){
+    var el=document.getElementById(id); if(el) el.value='';
+  });
+  document.getElementById('si-law').value='no';
+  document.getElementById('si-admin').value='no';
+  document.getElementById('si-case-wrap').style.display='none';
+  renderSecIncidents();
+  showToast('Security incident saved','success');
+}
+
+function renderSecIncidents(){
+  var list = document.getElementById('sec-incident-list');
+  if(!list) return;
+  var search = (document.getElementById('sec-search')||{}).value||'';
+  var typeFilter = (document.getElementById('sec-filter-type')||{}).value||'';
+  var filtered = SEC_INCIDENTS.filter(function(i){
+    var matchType = !typeFilter || i.type===typeFilter;
+    var matchSearch = !search || (i.narrative+i.location+i.type+i.submittedBy).toLowerCase().includes(search.toLowerCase());
+    return matchType && matchSearch;
+  });
+  if(!filtered.length){
+    list.innerHTML = '<div class="empty-state" style="padding:30px 0;"><p class="empty-title" style="font-size:14px;">No incidents recorded yet</p><p class="empty-hint">Use the button above to record the first incident.</p></div>';
+    return;
+  }
+  var typeColors = {'Physical Altercation':'var(--red)','Verbal Threat':'var(--red)','Theft':'var(--orange)','Trespassing':'var(--orange)','Unauthorized Access':'var(--yellow)','Elopement':'var(--yellow)','Suspicious Person':'var(--blue)','Property Damage':'var(--orange)','Other':'var(--t3)'};
+  list.innerHTML = '';
+  filtered.forEach(function(i){
+    var div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd);';
+    var col = typeColors[i.type]||'var(--t3)';
+    div.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:'+col+';margin-top:5px;flex-shrink:0;"></div>'
+      + '<div style="flex:1;">'
+      + '<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;">'
+      + '<span style="font-weight:800;font-size:13px;color:var(--t1);">'+i.type+'</span>'
+      + '<span style="font-size:11px;color:var(--t3);">'+i.date+(i.time?' '+i.time:'')+(i.location?' — '+i.location:'')+'</span>'
+      + (i.lawEnforcement==='yes'?'<span style="font-size:10px;background:rgba(255,75,75,.15);color:var(--red);border-radius:999px;padding:2px 8px;font-weight:700;">Law Enforcement</span>':'')
+      + '</div>'
+      + '<div style="font-size:12px;color:var(--t2);margin-top:4px;">'+i.narrative.substring(0,150)+(i.narrative.length>150?'...':'')+'</div>'
+      + '<div style="font-size:11px;color:var(--t3);margin-top:3px;">Submitted by: '+i.submittedBy+'</div>'
+      + '</div>';
+    list.appendChild(div);
+  });
+}
+
+/* ══════════════════════════════════════════════════════════════
+   OVERDUE MODAL
+══════════════════════════════════════════════════════════════ */
+function openOverdueModal(){
+  var list = document.getElementById('overdue-modal-list');
+  if(!list) return;
+  // Build list of overdue items from training sessions
+  var overdue = [];
+  var now = new Date();
+  (DB.sessions||[]).forEach(function(s){
+    if(!s.nextDate) return;
+    var d = new Date(s.nextDate);
+    if(d < now){
+      var daysOver = Math.floor((now-d)/(1000*60*60*24));
+      overdue.push({
+        title: s.topic||s.title||'Training',
+        module: 'Training',
+        dueDate: s.nextDate,
+        daysOver: daysOver,
+        assignee: s.instructor||s.trainer||''
+      });
+    }
+  });
+  // Add overdue rounds (departments not rounded in 30 days)
+  var ROUND_FREQ_DAYS = 30;
+  if(typeof DEPARTMENTS !== 'undefined'){
+    DEPARTMENTS.forEach(function(dept){
+      var dRnds = (DB.rounds||[]).filter(function(r){ return r.deptId===dept.id; });
+      var last = dRnds.sort(function(a,b){ return new Date(b.created)-new Date(a.created); })[0];
+      var lastDate = last ? new Date(last.date||last.created) : null;
+      if(!lastDate){ 
+        overdue.push({title:dept.label+' — Physical Environment Round',module:'Rounds',dueDate:'Never completed',daysOver:999,assignee:''});
+      } else {
+        var daysSince = Math.floor((now-lastDate)/(1000*60*60*24));
+        if(daysSince > ROUND_FREQ_DAYS){
+          overdue.push({title:dept.label+' — Physical Environment Round',module:'Rounds',dueDate:last.date||last.created,daysOver:daysSince-ROUND_FREQ_DAYS,assignee:''});
+        }
+      }
+    });
+  }
+  // Update the stat card count
+  var statEl = document.getElementById('stat-overdue');
+  if(statEl) statEl.textContent = overdue.length;
+  if(!overdue.length){
+    list.innerHTML = '<div style="text-align:center;padding:30px 0;"><div style="font-size:36px;margin-bottom:10px;">✅</div><div style="font-weight:800;color:var(--green);font-size:16px;">All caught up!</div><div style="color:var(--t3);font-size:13px;margin-top:6px;">No overdue items at this time.</div></div>';
+    openModal('overdueModal');
+    return;
+  }
+  overdue.sort(function(a,b){ return b.daysOver-a.daysOver; });
+  var h = '';
+  overdue.forEach(function(item){
+    var urgColor = item.daysOver > 60 ? 'var(--red)' : item.daysOver > 14 ? 'var(--orange)' : 'var(--yellow)';
+    var daysLabel = item.daysOver===999 ? 'Never completed' : item.daysOver+' day'+(item.daysOver===1?'':'s')+' overdue';
+    h += '<div style="display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--bd);">';
+    h += '<div style="width:8px;height:8px;border-radius:50%;background:'+urgColor+';margin-top:5px;flex-shrink:0;"></div>';
+    h += '<div style="flex:1;">';
+    h += '<div style="font-weight:800;font-size:13px;color:var(--t1);">'+item.title+'</div>';
+    h += '<div style="display:flex;gap:8px;align-items:center;margin-top:3px;flex-wrap:wrap;">';
+    h += '<span style="font-size:11px;background:rgba(255,75,75,.12);color:'+urgColor+';border-radius:999px;padding:2px 9px;font-weight:700;">'+daysLabel+'</span>';
+    h += '<span style="font-size:11px;color:var(--t3);">'+item.module+'</span>';
+    if(item.dueDate && item.dueDate !== 'Never completed') h += '<span style="font-size:11px;color:var(--t3);">Due: '+item.dueDate+'</span>';
+    h += '</div>';
+    if(item.assignee) h += '<div style="font-size:11px;color:var(--t3);margin-top:2px;">'+item.assignee+'</div>';
+    h += '</div></div>';
+  });
+  list.innerHTML = h;
+  openModal('overdueModal');
+}
+
+
+/* ── SAFETY MODULE ──────────────────────────────────────────── */
+var LINEN_CHECKLIST = [
+  'Soiled and clean linen are processed and transported separately — no cross-contamination',
+  'Workers handling soiled linen wearing required PPE (gloves, gown, mask)',
+  'Chemical safety requirements in place — SDS accessible for all laundry chemicals',
+  'Transport vehicles/carts are clean, covered, and in good condition',
+  'Processing documentation provided — wash temperatures, cycle records',
+  'Facility is clean, organized, and free of pest activity',
+  'No evidence of bloodborne pathogen exposure hazards',
+  'Current HLAC accreditation certificate on file (if applicable)'
+];
+var LINEN_INSPECTIONS = [];
+var SAFETY_MEETINGS = [];
+
+function openLinenVendorModal(){
+  var cl = document.getElementById('lv-checklist');
+  if(cl && !cl.children.length){
+    LINEN_CHECKLIST.forEach(function(item, i){
+      var d = document.createElement('div');
+      d.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);';
+      d.innerHTML = '<select id="lv-cl-'+i+'" style="background:var(--s3);border:1.5px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:11px;padding:4px 8px;outline:none;flex-shrink:0;">'
+        +'<option value="pass">Pass</option><option value="fail">Fail</option><option value="na">N/A</option></select>'
+        +'<span style="font-size:12px;color:var(--t2);">'+item+'</span>';
+      cl.appendChild(d);
+    });
+  }
+  // set today
+  var di = document.getElementById('lv-date');
+  if(di && !di.value) di.value = new Date().toISOString().split('T')[0];
+}
+
+function saveLinenInspection(){
+  var vendor = document.getElementById('lv-vendor').value.trim();
+  var date = document.getElementById('lv-date').value;
+  if(!vendor||!date){ showToast('Vendor name and date required','error'); return; }
+  var answers = {};
+  LINEN_CHECKLIST.forEach(function(item,i){
+    var sel = document.getElementById('lv-cl-'+i);
+    if(sel) answers[i] = sel.value;
+  });
+  var inspection = {
+    id:'LV-'+Date.now(), vendor:vendor, date:date,
+    inspector: document.getElementById('lv-inspector').value,
+    result: document.getElementById('lv-result').value,
+    findings: document.getElementById('lv-findings').value,
+    answers: answers, created: new Date().toISOString()
+  };
+  LINEN_INSPECTIONS.unshift(inspection);
+  closeModal('linenVendorModal');
+  renderLinenLog();
+  showToast('Linen vendor inspection saved','success');
+}
+
+function renderLinenLog(){
+  var log = document.getElementById('linen-vendor-log');
+  if(!log) return;
+  if(!LINEN_INSPECTIONS.length){
+    log.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No linen vendor inspections on record</p></div>';
+    return;
+  }
+  var resultColors = {pass:'var(--green)',fail:'var(--red)',conditional:'var(--yellow)'};
+  log.innerHTML = '';
+  LINEN_INSPECTIONS.forEach(function(ins){
+    var col = resultColors[ins.result]||'var(--t3)';
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);';
+    d.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0;"></div>'
+      +'<div style="flex:1;">'
+      +'<div style="font-weight:800;font-size:13px;color:var(--t1);">'+ins.vendor+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);">'+ins.date+' · Inspected by: '+ins.inspector+'</div>'
+      +(ins.findings?'<div style="font-size:12px;color:var(--t2);margin-top:2px;">'+ins.findings.substring(0,100)+'</div>':'')
+      +'</div>'
+      +'<span style="font-size:11px;background:'+col+'22;color:'+col+';border-radius:999px;padding:3px 10px;font-weight:700;text-transform:capitalize;">'+ins.result.replace('-',' ')+'</span>';
+    log.appendChild(d);
+  });
+}
+
+function saveSafetyMeeting(){
+  var date = document.getElementById('sm-date').value;
+  var facilitator = document.getElementById('sm-facilitator').value.trim();
+  if(!date||!facilitator){ showToast('Date and facilitator required','error'); return; }
+  var meeting = {
+    id:'SM-'+Date.now(), date:date,
+    location: document.getElementById('sm-location').value,
+    attendees: document.getElementById('sm-attendees').value,
+    topics: document.getElementById('sm-topics').value,
+    actions: document.getElementById('sm-actions').value,
+    facilitator: facilitator, created: new Date().toISOString()
+  };
+  SAFETY_MEETINGS.unshift(meeting);
+  closeModal('safetyMeetingModal');
+  renderSafetyMeetingLog();
+  showToast('Safety meeting agenda saved','success');
+}
+
+function renderSafetyMeetingLog(){
+  var log = document.getElementById('safety-meeting-log');
+  if(!log) return;
+  if(!SAFETY_MEETINGS.length){
+    log.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No meeting agendas on record</p></div>';
+    return;
+  }
+  log.innerHTML = '';
+  SAFETY_MEETINGS.forEach(function(m){
+    var d = document.createElement('div');
+    d.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);';
+    d.innerHTML = '<div style="flex:1;">'
+      +'<div style="font-weight:800;font-size:13px;color:var(--t1);">Safety Committee Meeting — '+m.date+'</div>'
+      +'<div style="font-size:11px;color:var(--t3);">'+(m.location?m.location+' · ':'')+' Facilitated by: '+m.facilitator+'</div>'
+      +(m.actions?'<div style="font-size:12px;color:var(--t2);margin-top:3px;"><strong>Actions:</strong> '+m.actions.substring(0,120)+'</div>':'')
+      +'</div>';
+    log.appendChild(d);
+  });
+}
+
 document.addEventListener("DOMContentLoaded", function(){ init(); });
 </script>
 
@@ -3093,6 +3943,259 @@ document.addEventListener("DOMContentLoaded", function(){ init(); });
       </div>
     </div>
   </div>
+
+
+  <!-- ── Life Safety Reference Panels ───────────────────────────── -->
+  <div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin:28px 0 12px;">Reference & Education Modules</div>
+
+  <div style="display:flex;flex-direction:column;gap:10px;" id="ls-ref-panels">
+
+    <!-- Hood Cleaning -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-hood')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,150,0,.12);">🔥</div>
+          <div><div class="ref-title">Hood Cleaning</div><div class="ref-sub">NFPA 96 · Semi-Annual · Dietary</div></div>
+        </div>
+        <svg id="ls-hood-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-hood" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 96 — Standard for Ventilation Control and Fire Protection of Commercial Cooking Operations</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Semi-annual minimum; quarterly if high-volume cooking</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>Hood, filters, grease traps, ductwork, and exhaust fan</p></div>
+          <div class="ref-col"><div class="ref-col-title">Vendor Requirement</div><p>Must be a certified hood cleaning company. Written report must be left on-site with service sticker applied.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Incomplete duct cleaning — only hood cleaned, ductwork missed</li><li>Missing service sticker on hood</li><li>No written report retained on-site</li><li>Vendor not certified</li><li>Grease buildup exceeding 1/8 inch</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-96-standard-development/96" target="_blank" class="ref-link">🔗 NFPA 96 Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- Dietary Hood Fire Suppression -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-suppression')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,75,75,.12);">🧯</div>
+          <div><div class="ref-title">Dietary Hood Fire Suppression</div><div class="ref-sub">NFPA 96 / NFPA 17A · Semi-Annual</div></div>
+        </div>
+        <svg id="ls-suppression-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-suppression" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 96 / NFPA 17A — Wet Chemical Extinguishing Systems</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Semi-annual inspection and service by licensed fire suppression contractor</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>Ansul or equivalent wet chemical system, fusible links, pull station, nozzle coverage and positioning</p></div>
+          <div class="ref-col"><div class="ref-col-title">Documentation</div><p>Contractor leaves a tagged inspection report. Retain on-site. Agent quantity verified at each inspection.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Expired fusible links — must be replaced per manufacturer schedule</li><li>Missing or illegible pull station tag</li><li>Improper nozzle positioning after equipment moves</li><li>Low agent quantity</li><li>No current inspection report on file</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-17a-standard-development/17a" target="_blank" class="ref-link">🔗 NFPA 17A Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- Emergency / Exit Lighting -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-exitlight')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,200,0,.12);">🚨</div>
+          <div><div class="ref-title">Emergency & Exit Sign Testing</div><div class="ref-sub">NFPA 101 §7.9 & 7.10 · Monthly + Annual</div></div>
+        </div>
+        <svg id="ls-exitlight-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-exitlight" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 101 Life Safety Code — Sections 7.9 (Emergency Lighting) & 7.10 (Exit Signs)</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p><strong>Monthly:</strong> 30-second functional test (push-button)<br/><strong>Annual:</strong> Full 90-minute discharge test</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>All battery-backed emergency lights and all illuminated exit signs throughout the facility</p></div>
+          <div class="ref-col"><div class="ref-col-title">90-Minute Test Documentation</div><p>Record: date, who performed test, each unit tested, pass/fail result, any units flagged for repair. Keep on file for survey.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Failed lamp or dead battery not replaced promptly</li><li>Exit sign blocked by signage or storage</li><li>Missing monthly test documentation</li><li>90-minute test not performed or not documented</li><li>Units not included on master inventory list</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-101-standard-development/101" target="_blank" class="ref-link">🔗 NFPA 101 Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- Fire Alarm -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-firealarm')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,75,75,.12);">🔔</div>
+          <div><div class="ref-title">Fire Alarm System</div><div class="ref-sub">NFPA 72 · Annual Contractor + Weekly/Monthly Visual</div></div>
+        </div>
+        <svg id="ls-firealarm-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-firealarm" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 72 — National Fire Alarm and Signaling Code</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Annual full inspection by licensed contractor; weekly/monthly visual walk by facility staff</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>Pull stations, smoke/heat detectors, notification appliances (horns/strobes), fire alarm control panel, monitoring connection</p></div>
+          <div class="ref-col"><div class="ref-col-title">What to Look For (Staff Rounds)</div><p>Panel in normal status (no faults), pull stations unobstructed, detectors not painted or covered, notification devices visible and unblocked</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Devices out of test or not included in annual inspection</li><li>Monitoring gaps — system not connected to central station</li><li>No current inspection report on file</li><li>Painted or dusty smoke detectors</li><li>Pull stations blocked by furniture or equipment</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-72-standard-development/72" target="_blank" class="ref-link">🔗 NFPA 72 Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- Fire Dampers -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-dampers')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(206,130,255,.12);">🌬️</div>
+          <div><div class="ref-title">Fire Dampers</div><div class="ref-sub">NFPA 80 / NFPA 90A / NFPA 105 · 4-Year & 6-Year</div></div>
+        </div>
+        <svg id="ls-dampers-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-dampers" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 80 (fire dampers), NFPA 90A (HVAC), NFPA 105 (smoke/combination dampers)</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Fire dampers: every <strong>4 years</strong>. Smoke and combination dampers: every <strong>6 years</strong> per NFPA 105. First test within 1 year of installation.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>All fire and smoke dampers at fire-rated wall and floor penetrations throughout the facility</p></div>
+          <div class="ref-col"><div class="ref-col-title">Testing Procedure</div><p>Drop damper, verify full closure, inspect for damage and obstructions, reset, verify proper operation. Document each damper by ID tag number.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Dampers that won't close — rust, debris, or physical obstruction</li><li>Obstructed or missing access panels — can't reach damper for testing</li><li>No testing record or damper inventory</li><li>Missing damper ID tags</li><li>Dampers not on testing schedule</li></ul>
+        </div>
+        <div class="ref-link-row">
+          <a href="https://www.nfpa.org/codes-and-standards/nfpa-80-standard-development/80" target="_blank" class="ref-link">🔗 NFPA 80</a>
+          <a href="https://www.nfpa.org/codes-and-standards/nfpa-105-standard-development/105" target="_blank" class="ref-link" style="margin-left:10px;">🔗 NFPA 105</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fire Doors -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-firedoors')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(77,159,255,.12);">🚪</div>
+          <div><div class="ref-title">Fire Doors</div><div class="ref-sub">NFPA 80 · Annual</div></div>
+        </div>
+        <svg id="ls-firedoors-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-firedoors" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 80 — Standard for Fire Doors and Other Opening Protectives</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Annual inspection of all fire-rated door assemblies</p></div>
+          <div class="ref-col"><div class="ref-col-title">Scope</div><p>Self-closing hardware, positive latching, clearances (max 3/4" at sides/top, 3/4" at bottom), frame integrity, glazing, coordinator function, hold-open devices</p></div>
+          <div class="ref-col"><div class="ref-col-title">Who Can Inspect</div><p>A qualified person with knowledge of NFPA 80. Deficiencies requiring repair must be addressed by a qualified contractor.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Door propped open with wedge, chair, or tied-back hardware</li><li>Broken or missing self-closer</li><li>Door does not latch positively when released</li><li>Damaged frame or door panel — holes, gaps, unauthorized modifications</li><li>Missing or illegible fire rating label</li><li>Coordinator malfunction on pair of doors</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-80-standard-development/80" target="_blank" class="ref-link">🔗 NFPA 80 Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- Fire Drills -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-drills')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(88,204,2,.12);">🏃</div>
+          <div><div class="ref-title">Fire Drill Requirements</div><div class="ref-sub">NFPA 101 · Quarterly per Shift</div></div>
+        </div>
+        <svg id="ls-drills-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-drills" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 101 Life Safety Code + accreditation body standards</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p>Quarterly per shift — all shifts must be covered annually (day, evening, and night shifts each get at least one drill per year)</p></div>
+          <div class="ref-col"><div class="ref-col-title">R.A.C.E.</div><p><strong>R</strong>escue anyone in immediate danger · <strong>A</strong>larm — activate the nearest pull station · <strong>C</strong>onfine — close all doors · <strong>E</strong>xtinguish if safe, or <strong>E</strong>vacuate</p></div>
+          <div class="ref-col"><div class="ref-col-title">P.A.S.S.</div><p><strong>P</strong>ull the pin · <strong>A</strong>im at the base of the fire · <strong>S</strong>queeze the handle · <strong>S</strong>weep side to side</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Not covering all shifts — only day shift drills documented</li><li>Missing post-drill critique documentation</li><li>Staff unable to demonstrate RACE or PASS</li><li>No drill documentation or incomplete records</li><li>Drills not spread across quarters</li></ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fire Extinguishers -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-extinguishers')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,75,75,.12);">🧯</div>
+          <div><div class="ref-title">Fire Extinguishers</div><div class="ref-sub">NFPA 10 · Monthly Visual + Annual Maintenance</div></div>
+        </div>
+        <svg id="ls-extinguishers-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-extinguishers" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 10 — Standard for Portable Fire Extinguishers</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p><strong>Monthly:</strong> Visual inspection by staff · <strong>Annual:</strong> Maintenance by certified vendor · <strong>6-Year:</strong> Internal inspection + hydrotest</p></div>
+          <div class="ref-col"><div class="ref-col-title">Placement Rules</div><p>Max 75-foot travel distance to any extinguisher. Mounted in visible, accessible location. Top of unit no higher than 5 feet. Clear space in front at all times.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Monthly Check Items</div><p>In correct location · Visible and unobstructed · Full charge (gauge in green) · Tamper seal intact · Inspection tag current · No damage or corrosion</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Missing units — not returned after use or discharge</li><li>Blocked or obstructed access</li><li>Annual inspection tag expired</li><li>Missing monthly initials on tag</li><li>Wrong extinguisher type for hazard class (e.g., no K-Class in kitchen)</li></ul>
+        </div>
+        <div class="ref-link-row">
+          <a href="https://www.nfpa.org/codes-and-standards/nfpa-10-standard-development/10" target="_blank" class="ref-link">🔗 NFPA 10 Standard Page</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Fire Sprinklers -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-sprinklers')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(77,159,255,.12);">💧</div>
+          <div><div class="ref-title">Fire Sprinkler System</div><div class="ref-sub">NFPA 13 / NFPA 25 · Weekly + Quarterly + Annual</div></div>
+        </div>
+        <svg id="ls-sprinklers-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-sprinklers" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 13 (installation) and NFPA 25 (inspection, testing & maintenance)</p></div>
+          <div class="ref-col"><div class="ref-col-title">Frequency</div><p><strong>Weekly:</strong> Control valve visual check · <strong>Quarterly:</strong> Waterflow/tamper alarm test · <strong>Annual:</strong> Full contractor inspection</p></div>
+          <div class="ref-col"><div class="ref-col-title">18-Inch Rule</div><p>Nothing may be stored within 18 inches of any sprinkler head. This is a hard stop — cited on almost every survey where storage is present.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Control Valve Check</div><p>Verify all control valves are in the open position and sealed/supervised. A closed valve means no water to that section — this is a critical finding.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>Storage within 18 inches of a sprinkler head</li><li>Painted or corroded sprinkler heads — must be replaced</li><li>Closed control valve — most serious finding</li><li>No weekly valve inspection log</li><li>Escutcheon plates missing (cosmetic but surveyed)</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-25-standard-development/25" target="_blank" class="ref-link">🔗 NFPA 25 Standard Page</a></div>
+      </div>
+    </div>
+
+    <!-- NFPA 99 Risk Assessments -->
+    <div class="panel ls-ref" onclick="toggleRef('ls-nfpa99')">
+      <div class="ref-hd">
+        <div class="ref-hd-left">
+          <div class="ref-ico" style="background:rgba(255,150,0,.12);">📋</div>
+          <div><div class="ref-title">NFPA 99 Healthcare Facilities Risk Assessments</div><div class="ref-sub">NFPA 99 · As Required for Renovations & New Systems</div></div>
+        </div>
+        <svg id="ls-nfpa99-arr" class="ref-arr" viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <div id="ls-nfpa99" class="ref-body" style="display:none;">
+        <div class="ref-grid">
+          <div class="ref-col"><div class="ref-col-title">Standard</div><p>NFPA 99 — Health Care Facilities Code</p></div>
+          <div class="ref-col"><div class="ref-col-title">When Required</div><p>When new systems are installed, spaces are renovated, or occupancy/use changes. Must be documented before work begins.</p></div>
+          <div class="ref-col"><div class="ref-col-title">Risk Categories</div><p><strong>Category 1:</strong> Failure likely to cause major injury or death · <strong>Category 2:</strong> Failure may cause minor injury · <strong>Category 3:</strong> Non-patient areas · <strong>Category 4:</strong> Administrative/business only</p></div>
+          <div class="ref-col"><div class="ref-col-title">ILSMs</div><p>Interim Life Safety Measures — required when life safety systems are impaired. Document activation date, measures taken, and restoration date.</p></div>
+        </div>
+        <div class="ref-deficiencies">
+          <div class="ref-col-title">Common Deficiencies</div>
+          <ul><li>No documented risk assessment before construction or renovation</li><li>Wrong risk category assigned — clinical area categorized as Category 3</li><li>ILSMs not activated when fire alarm or sprinkler impaired</li><li>ILSM activation not documented with start and end dates</li></ul>
+        </div>
+        <div class="ref-link-row"><a href="https://www.nfpa.org/codes-and-standards/nfpa-99-standard-development/99" target="_blank" class="ref-link">🔗 NFPA 99 Standard Page</a></div>
+      </div>
+    </div>
+
+  </div>
+
 </div>
 
 </body>
