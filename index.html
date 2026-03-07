@@ -593,12 +593,12 @@ textarea{resize:vertical;min-height:76px;}
         <span class="ai-dot"></span>
         <span class="panel-title" style="margin-bottom:0;">AI Compliance Assistant</span>
         <span style="margin-left:auto;display:flex;align-items:center;gap:8px;">
-          <span style="font-size:10px;background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.3);border-radius:var(--pill);padding:2px 8px;font-weight:700;">🌐 Live Search</span>
+          <span style="font-size:10px;background:rgba(77,159,255,.15);color:var(--blue);border:1px solid rgba(77,159,255,.3);border-radius:var(--pill);padding:2px 8px;font-weight:700;">🔍 Web Search</span>
           <button onclick="clearAIChat()" style="font-size:10px;background:none;border:1px solid var(--bd2);color:var(--t3);border-radius:var(--pill);padding:2px 8px;cursor:pointer;">Clear</button>
         </span>
       </div>
       <div class="ai-msgs" id="ai-msgs" style="max-height:200px;">
-        <div class="ai-in">Hello! I'm your AI Compliance Assistant with live web search. Ask me about <strong>Joint Commission</strong>, <strong>DNV</strong>, <strong>OSHA</strong>, <strong>NFPA</strong>, <strong>CMS</strong>, or any healthcare facility safety question. I'll cite the current standards.</div>
+        <div class="ai-in">Ask about <strong>TJC</strong>, <strong>DNV</strong>, <strong>OSHA</strong>, <strong>NFPA</strong>, <strong>CMS</strong>, or any healthcare safety topic. I'll open a focused web search so you get current, official guidance.</div>
       </div>
       <div class="ai-chips">
         <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">TJC fire door requirements?</button>
@@ -607,7 +607,7 @@ textarea{resize:vertical;min-height:76px;}
         <button class="ai-chip" onclick="dashAI(this)" ontouchend="event.preventDefault();dashAI(this)">NFPA 99 risk categories</button>
       </div>
       <div class="ai-row">
-        <input id="ai-input" class="ai-input" type="text" placeholder="Ask about TJC, OSHA, DNV, NFPA, CMS..." inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')dashSend()"/>
+        <input id="ai-input" class="ai-input" type="text" placeholder="Search TJC, OSHA, NFPA, CMS, DNV..." inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false" onkeydown="if(event.key==='Enter')dashSend()"/>
         <button class="ai-send" onclick="dashSend()" ontouchend="event.preventDefault();dashSend()">
           <svg viewBox="0 0 24 24"><path d="M22 2L11 13"/><path d="M22 2L15 22 11 13 2 9l20-7z"/></svg>
         </button>
@@ -1812,7 +1812,7 @@ textarea{resize:vertical;min-height:76px;}
       <button class="ai-chip" onclick="kbAsk(this)">What are the filter replacement intervals?</button>
     </div>
     <div style="display:flex;gap:8px;">
-      <input id="kb-q-input" class="ai-input" type="text" placeholder="Ask a question about your documents..."
+      <input id="kb-q-input" class="ai-input" type="text" placeholder="Search a compliance question..."
              inputmode="text" enterkeyhint="send" autocomplete="off" autocorrect="off" spellcheck="false"
              onkeydown="if(event.key==='Enter')kbSend()"/>
       <button class="ai-send" onclick="kbSend()">
@@ -4052,45 +4052,20 @@ function renderSafetyMeetingLog(){
 
 
 /* ── AI ASSISTANT ENGINE ────────────────────────────────── */
-var AI_HISTORY = [];   // dashboard conversation history
-var KB_HISTORY = [];   // knowledge base conversation history
 var AI_BUSY = false;
 var KB_BUSY = false;
 
-var AI_SYSTEM = `You are an expert AI Compliance Assistant for healthcare facility safety officers. You have deep knowledge of:
-
-ACCREDITATION BODIES:
-- The Joint Commission (TJC): Environment of Care (EC), Life Safety (LS), Emergency Management (EM), and all other chapters. Know current standards, survey expectations, RFIs, and SOC requirements.
-- DNV Healthcare: NIAHO standards, ISO 9001-based survey process, annual surveys vs TJC triennial, and how DNV differs from TJC on specific requirements.
-- CMS Conditions of Participation (CoP): The regulatory baseline that both TJC and DNV must meet. Know when TJC/DNV deemed status applies.
-
-SAFETY REGULATIONS:
-- OSHA: 29 CFR 1910 (General Industry), including 1910.1030 (Bloodborne Pathogens), 1910.1200 (HazCom/GHS), 1910.147 (LOTO), 1910.132 (PPE), 1910.22 (Walking Surfaces), 1910.303 (Electrical). Also OSHA's healthcare-specific guidance and state OSHA plans.
-- NFPA: 101 (Life Safety Code), 99 (Healthcare Facilities), 72 (Fire Alarm), 13 (Sprinklers), 25 (Water-Based Systems), 10 (Extinguishers), 80 (Fire Doors), 96 (Kitchen Hoods). Know which edition TJC currently adopts.
-- EPA/DEA: RCRA hazardous waste, pharmaceutical waste (P-listed, U-listed), DEA controlled substance disposal.
-- DOT: 49 CFR hazardous materials transportation.
-
-STATE-SPECIFIC GUIDANCE:
-- When the user mentions a state, reference that state's health department regulations, state fire marshal requirements, and any state OSHA plan differences.
-- Common state health codes for hospitals (Conditions of Licensure) differ from federal CoPs — flag when state rules are MORE restrictive.
-- If user mentions a city, note any applicable local fire codes or health ordinances.
-
-RESPONSE STYLE:
-- Always cite the specific standard, chapter, and section number when possible (e.g., "TJC EC.02.06.01 EP 1" or "29 CFR 1910.1030(d)(2)").
-- Lead with the direct answer, then cite the source.
-- Use bullet points for multi-part answers.
-- If a question involves state-specific rules and you don't know the user's state, ask them.
-- Flag if a standard has been recently updated and the user should verify the current edition.
-- Be practical — give surveyable, actionable answers a working safety officer can use.
-- Keep answers focused. For complex topics, offer to go deeper on any section.`;
+// Builds a healthcare-focused search query
+function buildSearchQuery(q){
+  var hasStd = /\b(tjc|joint commission|dnv|niaho|cms|osha|nfpa|29 cfr|42 cfr|cdc|jcaho)\b/i.test(q);
+  return hasStd ? q + ' hospital healthcare' : q + ' hospital healthcare safety compliance regulation';
+}
 
 function escHtml(s){ return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function fmtAIText(text){
-  // Convert markdown-ish formatting to HTML for better readability
   return text
     .replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g,'<em>$1</em>')
     .replace(/`(.+?)`/g,'<code style="background:var(--s3);padding:1px 5px;border-radius:4px;font-size:11px;">$1</code>')
     .replace(/^#{1,3} (.+)$/gm,'<div style="font-weight:800;color:var(--t1);margin-top:8px;margin-bottom:2px;">$1</div>')
     .replace(/^[-•] (.+)$/gm,'<div style="padding-left:12px;">• $1</div>')
@@ -4109,8 +4084,6 @@ function appendMsg(containerEl, role, text, isTyping){
     div.textContent = text;
   } else {
     div.className = 'ai-in';
-    div.innerHTML = fmtAIText(escHtml(text).replace(/&lt;br&gt;/g,'<br>').replace(/&lt;strong&gt;/g,'<strong>').replace(/&lt;\/strong&gt;/g,'</strong>'));
-    // Re-apply formatting after escaping
     div.innerHTML = fmtAIText(text);
   }
   containerEl.appendChild(div);
@@ -4119,9 +4092,8 @@ function appendMsg(containerEl, role, text, isTyping){
 }
 
 function clearAIChat(){
-  AI_HISTORY = [];
   var msgs = document.getElementById('ai-msgs');
-  if(msgs) msgs.innerHTML = '<div class="ai-in">Chat cleared. Ask me anything about TJC, DNV, OSHA, NFPA, CMS, or state healthcare regulations.</div>';
+  if(msgs){ var _clr='Chat cleared. Type a question and I will search the web for current guidance.'; msgs.innerHTML='<div class="ai-in">'+_clr+'</div>'; }
 }
 
 function dashAI(btn){
@@ -4130,80 +4102,33 @@ function dashAI(btn){
   if(inp && q){ inp.value = q; dashSend(); }
 }
 
-async function dashSend(){
-  if(AI_BUSY) return;
+function dashSend(){
   var inp = document.getElementById('ai-input');
   var msgs = document.getElementById('ai-msgs');
   if(!inp || !msgs) return;
   var q = inp.value.trim();
   if(!q) return;
-  AI_BUSY = true;
   inp.value = '';
-  inp.disabled = true;
 
+  // Show user message in panel
   appendMsg(msgs, 'user', q);
-  AI_HISTORY.push({role:'user', content: q});
-  var typingEl = appendMsg(msgs, 'assistant', '', true);
 
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: AI_SYSTEM,
-        tools:[{type:'web_search_20250305', name:'web_search'}],
-        messages: AI_HISTORY
-      })
-    });
-    var data = await res.json();
-    // Extract text from response (may include tool_use blocks)
-    var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-    if(!text && data.content){
-      // If response stopped for tool use, make a follow-up call with tool results embedded
-      var hasToolUse = (data.content||[]).some(function(b){return b.type==='tool_use';});
-      if(hasToolUse){
-        // Add assistant response with tool use to history
-        AI_HISTORY.push({role:'assistant', content: data.content});
-        // Add tool result placeholders (web search runs server-side, result comes back in next turn)
-        var toolResults = (data.content||[]).filter(function(b){return b.type==='tool_use';}).map(function(b){
-          return {type:'tool_result', tool_use_id: b.id, content:'[search completed]'};
-        });
-        AI_HISTORY.push({role:'user', content: toolResults});
-        // Make follow-up call
-        var res2 = await fetch('https://api.anthropic.com/v1/messages',{
-          method:'POST',
-          headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({
-            model:'claude-sonnet-4-20250514',
-            max_tokens:1000,
-            system: AI_SYSTEM,
-            tools:[{type:'web_search_20250305', name:'web_search'}],
-            messages: AI_HISTORY
-          })
-        });
-        var data2 = await res2.json();
-        text = (data2.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-        AI_HISTORY.push({role:'assistant', content: text || '...'});
-      } else {
-        AI_HISTORY.push({role:'assistant', content: text || '...'});
-      }
-    } else {
-      AI_HISTORY.push({role:'assistant', content: text || '...'});
-    }
-    // Keep history manageable (last 20 turns)
-    if(AI_HISTORY.length > 20) AI_HISTORY = AI_HISTORY.slice(AI_HISTORY.length - 20);
-    if(typingEl) typingEl.remove();
-    if(text){ appendMsg(msgs, 'assistant', text); }
-    else { appendMsg(msgs, 'assistant', 'I encountered an issue processing that. Please try again.'); }
-  } catch(e) {
-    if(typingEl) typingEl.remove();
-    appendMsg(msgs, 'assistant', '⚠ Connection error. Please check your network and try again.');
-  }
-  AI_BUSY = false;
-  inp.disabled = false;
-  inp.focus();
+  // Build search-ready query
+  var searchQ = buildSearchQuery(q);
+  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+
+  // Show result card with search link
+  var card = document.createElement('div');
+  card.className = 'ai-in';
+  card.innerHTML =
+    '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;">🔍 Searching the web for:</div>' +
+    '<div style="font-weight:700;color:var(--t1);margin-bottom:10px;">' + escHtml(searchQ) + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+    '<a href="' + url + '" target="_blank" rel="noopener" style="background:var(--green);color:#fff;text-decoration:none;padding:7px 14px;border-radius:var(--pill);font-size:12px;font-weight:700;">Open Search ↗</a>' +
+    '<a href="https://www.google.com/search?q=' + encodeURIComponent(q + ' site:jointcommission.org OR site:osha.gov OR site:nfpa.org OR site:cms.gov') + '" target="_blank" rel="noopener" style="background:var(--gbg);border:1px solid var(--gbd);color:var(--green);text-decoration:none;padding:7px 14px;border-radius:var(--pill);font-size:12px;font-weight:700;">Official Sources ↗</a>' +
+    '</div>';
+  msgs.appendChild(card);
+  msgs.scrollTop = msgs.scrollHeight;
 }
 
 /* ── KNOWLEDGE BASE AI ──────────────────────────────────── */
@@ -4228,28 +4153,22 @@ async function kbSend(){
   KB_HISTORY.push({role:'user', content: q});
   var typingEl = appendMsg(chat, 'assistant', '', true);
 
-  try {
-    var res = await fetch('https://api.anthropic.com/v1/messages',{
-      method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({
-        model:'claude-sonnet-4-20250514',
-        max_tokens:1000,
-        system: AI_SYSTEM,
-        tools:[{type:'web_search_20250305', name:'web_search'}],
-        messages: KB_HISTORY
-      })
-    });
-    var data = await res.json();
-    var text = (data.content||[]).filter(function(b){return b.type==='text';}).map(function(b){return b.text;}).join('');
-    KB_HISTORY.push({role:'assistant', content: text || '...'});
-    if(KB_HISTORY.length > 16) KB_HISTORY = KB_HISTORY.slice(KB_HISTORY.length - 16);
-    if(typingEl) typingEl.remove();
-    appendMsg(chat, 'assistant', text || 'No response received. Try rephrasing.');
-  } catch(e) {
-    if(typingEl) typingEl.remove();
-    appendMsg(chat, 'assistant', '⚠ Connection error. Please try again.');
-  }
+  // Build web search and show result card
+  var searchQ = buildSearchQuery(q);
+  var url = 'https://www.google.com/search?q=' + encodeURIComponent(searchQ);
+  if(typingEl) typingEl.remove();
+
+  var card = document.createElement('div');
+  card.className = 'ai-in';
+  card.innerHTML =
+    '<div style="font-size:12px;color:var(--t2);margin-bottom:8px;">🔍 Searching the web for:</div>' +
+    '<div style="font-weight:700;color:var(--t1);margin-bottom:10px;">' + escHtml(searchQ) + '</div>' +
+    '<div style="display:flex;gap:8px;flex-wrap:wrap;">' +
+    '<a href="' + url + '" target="_blank" rel="noopener" style="background:var(--green);color:#fff;text-decoration:none;padding:7px 14px;border-radius:var(--pill);font-size:12px;font-weight:700;">Open Search ↗</a>' +
+    '<a href="https://www.google.com/search?q=' + encodeURIComponent(q + ' site:jointcommission.org OR site:osha.gov OR site:nfpa.org OR site:cms.gov') + '" target="_blank" rel="noopener" style="background:var(--gbg);border:1px solid var(--gbd);color:var(--green);text-decoration:none;padding:7px 14px;border-radius:var(--pill);font-size:12px;font-weight:700;">Official Sources ↗</a>' +
+    '</div>';
+  chat.appendChild(card);
+  chat.scrollTop = chat.scrollHeight;
   KB_BUSY = false;
   inp.disabled = false;
 }
