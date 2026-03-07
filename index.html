@@ -2663,7 +2663,12 @@ async function loadAllData() {
       catch(e) { DB.settings[r.id] = r.value; }
     });
 
-    console.log('Supabase loaded OK — sessions:', DB.sessions.length, 'rounds:', DB.rounds.length);
+    // Security Incidents
+    var siRes = await _sb.from('security_incidents').select('*').order('created', {ascending: false});
+    if (siRes.error) throw new Error('security_incidents: ' + siRes.error.message);
+    SEC_INCIDENTS = siRes.data || [];
+
+    console.log('Supabase loaded OK — sessions:', DB.sessions.length, 'rounds:', DB.rounds.length, 'incidents:', SEC_INCIDENTS.length);
 
   } catch(e) {
     console.error('loadAllData FAILED:', e.message);
@@ -3708,6 +3713,7 @@ function saveSecIncident(){
     created: new Date().toISOString()
   };
   SEC_INCIDENTS.unshift(incident);
+  saveSecIncidentDB(incident);
   closeModal('secIncidentModal');
   // Clear form
   ['si-date','si-time','si-location','si-type','si-persons','si-witness','si-narrative','si-case','si-followup','si-submitted'].forEach(function(id){
@@ -4217,6 +4223,7 @@ function saveNewSession(){
   };
   DB.sessions = DB.sessions || [];
   DB.sessions.unshift(session);
+  saveSession(session);
   closeModal('createTrainingModal');
   ['ct-topic','ct-date','ct-duration','ct-dept','ct-trainer','ct-nextdate','ct-notes'].forEach(function(id){
     var el=document.getElementById(id); if(el) el.value='';
@@ -4227,6 +4234,157 @@ function saveNewSession(){
 }
 
 document.addEventListener("DOMContentLoaded", function(){ init(); });
+
+// ── SECURITY INCIDENTS — SUPABASE PERSISTENCE ────────────────────────────────
+
+async function saveSecIncidentDB(incident) {
+  try {
+    var res = await _sb.from('security_incidents').insert(incident);
+    if (res.error) throw res.error;
+  } catch(e) {
+    console.error('saveSecIncidentDB failed:', e.message);
+    showToast('Warning: incident saved locally but not to server — check connection', 'error');
+  }
+}
+
+// ── KNOWLEDGE BASE ────────────────────────────────────────────────────────────
+
+var KB_DOCS = [];
+var KB_HISTORY = [];
+
+async function kbLoadFromSupabase() {
+  try {
+    var res = await _sb.from('knowledge_base').select('*').order('created', {ascending: false});
+    if (res.error) throw res.error;
+    KB_DOCS = res.data || [];
+    kbRender(KB_DOCS);
+  } catch(e) {
+    console.error('kbLoadFromSupabase failed:', e.message);
+  }
+}
+
+async function kbHandleUpload(input) {
+  var files = input.files;
+  if (!files || !files.length) return;
+  var label = input.closest('label');
+  if (label) { label.style.opacity = '0.6'; label.style.pointerEvents = 'none'; }
+  var errors = 0;
+  for (var i = 0; i < files.length; i++) {
+    var file = files[i];
+    try {
+      var safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      var path = 'docs/' + Date.now() + '_' + safeName;
+      var upRes = await _sb.storage.from('knowledge-base').upload(path, file, {upsert: false});
+      if (upRes.error) throw upRes.error;
+      var urlData = _sb.storage.from('knowledge-base').getPublicUrl(path);
+      var url = (urlData.data && urlData.data.publicUrl) ? urlData.data.publicUrl : '';
+      var ext = file.name.split('.').pop().toLowerCase();
+      var category = guessKBCategory(file.name);
+      var doc = {
+        id: 'KB-' + Date.now() + '-' + i,
+        name: file.name,
+        category: category,
+        url: url,
+        storage_path: path,
+        file_type: ext,
+        size: file.size,
+        uploaded_by: (DB.settings && DB.settings.username) ? DB.settings.username : 'Staff',
+        created: new Date().toISOString()
+      };
+      var saveRes = await _sb.from('knowledge_base').insert(doc);
+      if (saveRes.error) throw saveRes.error;
+      KB_DOCS.unshift(doc);
+    } catch(e) {
+      console.error('Upload failed for ' + file.name + ':', e.message);
+      showToast('Failed to upload ' + file.name + ': ' + e.message, 'error');
+      errors++;
+    }
+  }
+  input.value = '';
+  if (label) { label.style.opacity = ''; label.style.pointerEvents = ''; }
+  kbRender(KB_DOCS);
+  if (!errors) showToast(files.length + ' document' + (files.length > 1 ? 's' : '') + ' uploaded', 'success');
+}
+
+function guessKBCategory(filename) {
+  var name = filename.toLowerCase();
+  if (/fire|sprinkler|extinguisher|alarm|nfpa|damper/.test(name)) return 'Life Safety';
+  if (/osha|safety|ppe|lockout|ergonomic/.test(name)) return 'Safety';
+  if (/hazmat|sds|chemical|waste|pharmacy/.test(name)) return 'Hazmat';
+  if (/training|toolbox|orientation/.test(name)) return 'Training';
+  if (/security|incident|access|badge/.test(name)) return 'Security';
+  if (/emergency|eop|hva|evacuation|code/.test(name)) return 'Emergency Management';
+  if (/vendor|contract|certification|license/.test(name)) return 'Vendor Files';
+  if (/policy|procedure|protocol/.test(name)) return 'Policies';
+  return 'General';
+}
+
+function kbSearch(q) {
+  if (!q || !q.trim()) { kbRender(KB_DOCS); return; }
+  var lower = q.toLowerCase();
+  var filtered = KB_DOCS.filter(function(d) {
+    return (d.name || '').toLowerCase().includes(lower) ||
+           (d.category || '').toLowerCase().includes(lower) ||
+           (d.uploaded_by || '').toLowerCase().includes(lower) ||
+           (d.file_type || '').toLowerCase().includes(lower);
+  });
+  kbRender(filtered, true);
+}
+
+function kbRender(docs, isFiltered) {
+  var list  = document.getElementById('kb-doc-list');
+  var countEl    = document.getElementById('kb-count');
+  var manualsEl  = document.getElementById('kb-manuals');
+  var drawingsEl = document.getElementById('kb-drawings');
+  var sheetsEl   = document.getElementById('kb-sheets');
+
+  // Update stats from full KB_DOCS (not filtered)
+  if (countEl)    countEl.textContent    = KB_DOCS.length;
+  if (manualsEl)  manualsEl.textContent  = KB_DOCS.filter(function(d){ return ['pdf','doc','docx','txt'].includes((d.file_type||'').toLowerCase()); }).length;
+  if (drawingsEl) drawingsEl.textContent = KB_DOCS.filter(function(d){ return ['dwg','dxf','png','jpg','jpeg'].includes((d.file_type||'').toLowerCase()); }).length;
+  if (sheetsEl)   sheetsEl.textContent   = KB_DOCS.filter(function(d){ return ['xlsx','xls','csv'].includes((d.file_type||'').toLowerCase()); }).length;
+
+  if (!list) return;
+  if (!docs || !docs.length) {
+    list.innerHTML = '<div class="empty-state" style="padding:40px 20px;">' +
+      '<div class="empty-ico"><svg viewBox="0 0 24 24" style="stroke:var(--t3)"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></div>' +
+      '<p class="empty-title">' + (isFiltered ? 'No matching documents' : 'No documents yet') + '</p>' +
+      '<p class="empty-hint">' + (isFiltered ? 'Try a different search term.' : 'Upload O&amp;M manuals, spreadsheets, or drawings to get started.') + '</p></div>';
+    return;
+  }
+
+  var extIcons = {pdf:'📄',xlsx:'📊',xls:'📊',csv:'📊',dwg:'📐',dxf:'📐',png:'🖼️',jpg:'🖼️',jpeg:'🖼️',doc:'📝',docx:'📝',txt:'📝'};
+  var extColors = {pdf:'var(--red)',xlsx:'var(--green)',xls:'var(--green)',csv:'var(--green)',dwg:'var(--blue)',dxf:'var(--blue)',png:'var(--purple)',jpg:'var(--purple)',jpeg:'var(--purple)',doc:'var(--blue)',docx:'var(--blue)',txt:'var(--t3)'};
+
+  // Group by category
+  var grouped = {};
+  docs.forEach(function(d) {
+    var cat = d.category || 'General';
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(d);
+  });
+
+  var html = '';
+  Object.keys(grouped).sort().forEach(function(cat) {
+    html += '<div style="font-size:11px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.07em;margin:18px 0 8px;">' + cat + '</div>';
+    grouped[cat].forEach(function(d) {
+      var ext   = (d.file_type || '').toLowerCase();
+      var icon  = extIcons[ext] || '📎';
+      var color = extColors[ext] || 'var(--t3)';
+      var size  = d.size ? (d.size > 1048576 ? (d.size/1048576).toFixed(1)+' MB' : Math.round(d.size/1024)+' KB') : '';
+      var date  = d.created ? new Date(d.created).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}) : '';
+      html += '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);">' +
+        '<div style="width:36px;height:36px;border-radius:9px;background:' + color + '22;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:17px;">' + icon + '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-weight:700;font-size:13px;color:var(--t1);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">' + escHtml(d.name || 'Untitled') + '</div>' +
+          '<div style="font-size:11px;color:var(--t3);margin-top:2px;">' + date + (size ? ' · ' + size : '') + (d.uploaded_by ? ' · ' + escHtml(d.uploaded_by) : '') + '</div>' +
+        '</div>' +
+        (d.url ? '<a href="' + d.url + '" target="_blank" rel="noopener" style="flex-shrink:0;background:var(--s3);border:1px solid var(--bd);border-radius:8px;padding:5px 12px;font-size:11px;font-weight:700;color:var(--t1);text-decoration:none;">Open ↗</a>' : '') +
+        '</div>';
+    });
+  });
+  list.innerHTML = html;
+}
 
 </script>
 
