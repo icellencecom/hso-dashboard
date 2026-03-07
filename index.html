@@ -341,17 +341,19 @@ textarea{resize:vertical;min-height:76px;}
 <body>
 
 <nav class="nav">
-  <img id="nav-logo" class="nav-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 36'%3E%3Crect width='90' height='36' rx='6' fill='%2358cc02'/%3E%3Ctext x='45' y='25' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='16' fill='white'%3EHSO%3C/text%3E%3C/svg%3E" alt="HSO"/>
+  <img id="nav-logo" class="nav-logo" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 90 36'%3E%3Crect width='90' height='36' rx='6' fill='%2358cc02'/%3E%3Ctext x='45' y='25' text-anchor='middle' font-family='sans-serif' font-weight='900' font-size='16' fill='white'%3EHSO%3C/text%3E%3C/svg%3E" alt="HSO" onclick="showView('dashboard')" style="cursor:pointer;"/>
   <div class="nav-sep"></div>
   <div class="nav-links">
-    <button class="nb" onclick="showView('dashboard')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</button>
     <button class="nb" onclick="showView('training')"><svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>Training</button>
-    <button class="nb" onclick="showView('lifesafety')"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>Life Safety</button>
     <button class="nb" onclick="showView('rounds')"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>Rounds</button>
-    <button class="nb" onclick="showView('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>Settings</button>
+    <button class="nb" onclick="showView('forms')"><svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>Forms</button>
+    <button class="nb" onclick="showView('knowledge')"><svg viewBox="0 0 24 24"><path d="M2 3h6a4 4 0 014 4v14a3 3 0 00-3-3H2z"/><path d="M22 3h-6a4 4 0 00-4 4v14a3 3 0 013-3h7z"/></svg>Knowledge Base</button>
   </div>
   <div class="nav-right">
     <div class="live"><span class="live-dot"></span>Live</div>
+    <button class="nb" onclick="location.reload()" title="Refresh" style="padding:5px 9px;">
+      <svg viewBox="0 0 24 24" style="width:15px;height:15px;"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>
+    </button>
     <div class="nav-clock" id="clock">--:-- --</div>
     <div class="nav-user">
       <div class="nav-av" id="nav-initials">JM</div>
@@ -2271,7 +2273,7 @@ async function saveRoundToDB(round) {
 async function deleteRoundDB(id) {
   await sbDelete('rounds', id);
 
-(async function init(){
+async function init(){
   var hash=window.location.hash;
   // Check if config has been set
   if(!_sb){
@@ -2312,7 +2314,7 @@ async function deleteRoundDB(id) {
   }).catch(function(e){
     console.error('Background load failed:', e);
   });
-})();
+}
 
 
 
@@ -3367,6 +3369,8 @@ async function kbLoadFromSupabase() {
   } catch(e) { console.warn('KB load failed', e); }
 }
 }
+
+document.addEventListener("DOMContentLoaded", function(){ init(); });
 </script>
 </body>
 </html>
