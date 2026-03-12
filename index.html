@@ -2921,7 +2921,12 @@ async function saveEditSession(){
   s.desc=document.getElementById('et-desc').value;
   s.status=document.getElementById('et-status').value;
   var capEl=document.getElementById('et-cap');if(capEl)s.capacity=capEl.value;
+  var wasCompleted = s.status === 'completed';
   await saveSession(s);closeModal('editSessionModal');renderTraining();updateTrainingStats();showToast('Session updated!','success');
+  if (wasCompleted) {
+    var atts = DB.attendance[s.id] || [];
+    sendCertificateEmails(s, atts);
+  }
 }
 
 async function deleteSession(id){
@@ -2954,6 +2959,31 @@ function printCert(){
   w.document.write('<html><head><style>body{margin:40px;font-family:Georgia,serif;}</style></head><body>'+content+'<\/body><\/html>');
   w.document.close();
   setTimeout(function(){w.print();},400);
+}
+
+function sendCertificateEmails(session, attendees) {
+  var facility = (DB.settings && DB.settings.hosp) || 'Your Facility';
+  var instructor = session.instructor || 'Instructor';
+  var dateStr = fDate(session.date);
+  var ceuLine = session.hours ? 'CEU Hours: ' + session.hours + '\n' : '';
+  var withEmails = (attendees || []).filter(function(a){ return a.email && a.email.trim(); });
+  if (!withEmails.length) return;
+
+  var emails = withEmails.map(function(a){ return a.email.trim(); }).join(',');
+  var subject = 'Certificate of Completion — ' + session.title;
+  var body = 'Congratulations!\n\nYou have successfully completed the following training:\n\n' +
+    'Course: ' + session.title + '\n' +
+    'Date: ' + dateStr + '\n' +
+    ceuLine +
+    'Instructor: ' + instructor + '\n' +
+    'Facility: ' + facility + '\n\n' +
+    'This email serves as your official record of completion. Please retain for your training file.\n\n' +
+    'Thank you,\n' + facility;
+
+  window.location.href = 'mailto:' + encodeURIComponent(emails) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(body);
+  showToast('Certificate email prepared for ' + withEmails.length + ' attendee' + (withEmails.length > 1 ? 's' : ''), 'success');
 }
 
 
@@ -3972,6 +4002,9 @@ async function submitRound(skipComplete){
     });
   } catch(e){ console.warn('Round save failed', e); }
 
+  // Auto-save round report HTML to Supabase Storage
+  saveRoundReportToSupabase(round);
+
   document.getElementById('rounds-form').style.display = 'none';
   document.getElementById('rounds-complete').style.display = 'block';
 
@@ -4107,6 +4140,56 @@ function printLastRound(){
   win.document.write(h);
   win.document.close();
   setTimeout(function(){ win.print(); },400);
+}
+
+async function saveRoundReportToSupabase(round) {
+  try {
+    if (!_sb) return;
+    var dept = DEPARTMENTS.find(function(d){ return d.id === round.deptId; });
+    var s = round.stats || {};
+    var h = '<html><head><title>Round Report</title><style>body{font-family:Arial,sans-serif;padding:30px;color:#111;}h1{font-size:20px;margin:0 0 6px;}p{margin:4px 0;font-size:13px;}h2{font-size:13px;color:#555;margin:18px 0 6px;border-bottom:1px solid #ddd;padding-bottom:4px;}table{width:100%;border-collapse:collapse;margin-top:6px;}td,th{padding:7px 10px;border:1px solid #ddd;font-size:12px;text-align:left;}.pass{color:#16a34a;font-weight:700;}.fail{color:#dc2626;font-weight:700;}.na{color:#9ca3af;}</style></head><body>';
+    h += '<h1>' + round.deptLabel + ' &mdash; Physical Environment Round Report</h1>';
+    h += '<p><strong>Date:</strong> ' + round.date + (round.time ? ' ' + round.time : '') + '</p>';
+    h += '<p><strong>Inspector:</strong> ' + round.inspector + '</p>';
+    h += '<p><strong>Score:</strong> ' + s.score + '% &nbsp;&nbsp; Passed: ' + s.passed + ' &nbsp; Failed: ' + (s.failed||0) + ' &nbsp; N/A: ' + (s.skipped||0) + '</p>';
+    if (round.notes) h += '<p><strong>Notes:</strong> ' + round.notes + '</p>';
+    if (dept && round.answers) {
+      dept.sections.forEach(function(section) {
+        h += '<h2>' + section.title + '</h2><table><tr><th>Item</th><th>Result</th><th>Notes</th></tr>';
+        section.items.forEach(function(item) {
+          var ans = round.answers[item.id] || '--';
+          var note = round.answers[item.id + '_note'] || '';
+          h += '<tr><td>' + item.text + '</td><td class="' + ans + '">' + ans.toUpperCase() + '</td><td>' + note + '</td></tr>';
+        });
+        h += '</table>';
+      });
+    }
+    h += '</body></html>';
+
+    var blob = new Blob([h], {type: 'text/html'});
+    var path = 'rounds/' + round.id + '.html';
+    var upRes = await _sb.storage.from('knowledge-base').upload(path, blob, {upsert: true, contentType: 'text/html'});
+    if (upRes.error) throw upRes.error;
+
+    var urlData = _sb.storage.from('knowledge-base').getPublicUrl(path);
+    var url = (urlData.data && urlData.data.publicUrl) ? urlData.data.publicUrl : '';
+
+    var doc = {
+      id: 'RR-' + round.id,
+      name: round.deptLabel + ' Round Report — ' + round.date,
+      category: 'Round Reports',
+      url: url,
+      storage_path: path,
+      file_type: 'html',
+      size: blob.size,
+      uploaded_by: round.inspector,
+      created: round.created
+    };
+    if (CURRENT_USER_ID) doc.user_id = CURRENT_USER_ID;
+    await _sb.from('knowledge_base').upsert(doc);
+  } catch(e) {
+    console.error('Failed to save round report to Supabase:', e.message);
+  }
 }
 
 function exportRoundsCSV(){
