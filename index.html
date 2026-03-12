@@ -2484,6 +2484,8 @@ var SUPABASE_KEY = 'sb_publishable_oOOfYCAk9f-aPbIDKP3KMA_G4__10TI';
 var _sb = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
 var CURRENT_USER = null;
 var CURRENT_USER_ID = null;
+// Returns null for the local admin bypass so DB operations skip the user_id filter/column
+function realUserId() { return (CURRENT_USER_ID && CURRENT_USER_ID !== 'admin-local') ? CURRENT_USER_ID : null; }
 
 var DB = {
   sessions: [],
@@ -3202,14 +3204,16 @@ async function fTS(ts){return new Date(ts).toLocaleString('en-US',{month:'short'
 
 async function sbGet(table) {
   var q = _sb.from(table).select('*');
-  if (CURRENT_USER_ID) q = q.eq('user_id', CURRENT_USER_ID);
+  var uid = realUserId();
+  if (uid) q = q.eq('user_id', uid);
   var res = await q;
   if (res.error) { console.error('sbGet ' + table, res.error); return []; }
   return res.data || [];
 }
 
 async function sbUpsert(table, row) {
-  if (CURRENT_USER_ID && !row.user_id) row = Object.assign({}, row, {user_id: CURRENT_USER_ID});
+  var uid = realUserId();
+  if (uid && !row.user_id) row = Object.assign({}, row, {user_id: uid});
   var res = await _sb.from(table).upsert(row, {onConflict:'id'});
   if (res.error) console.error('sbUpsert ' + table, res.error);
   return res;
@@ -3223,22 +3227,30 @@ async function sbDelete(table, id) {
 
 async function sbSetting(key, value) {
   if (!CURRENT_USER_ID) return;
-  var res = await _sb.from('settings').upsert({user_id: CURRENT_USER_ID, id: key, value: JSON.stringify(value)}, {onConflict:'user_id,id'});
+  var uid = realUserId();
+  if (!uid) { console.warn('sbSetting skipped — admin-local bypass'); return; }
+  var res = await _sb.from('settings').upsert({user_id: uid, id: key, value: JSON.stringify(value)}, {onConflict:'user_id,id'});
   if (res.error) console.error('sbSetting', res.error);
 }
 
 async function sbGetSetting(key) {
   if (!CURRENT_USER_ID) return null;
-  var res = await _sb.from('settings').select('value').eq('user_id', CURRENT_USER_ID).eq('id', key).single();
+  var uid = realUserId();
+  if (!uid) return null;
+  var res = await _sb.from('settings').select('value').eq('user_id', uid).eq('id', key).single();
   if (res.error || !res.data) return null;
   try { return JSON.parse(res.data.value); } catch(e) { return res.data.value; }
 }
 
 async function loadAllData() {
   try {
+    var uid = realUserId();
+
     // Test connection first with a simple ping
+    var pingQ = _sb.from('settings').select('id').limit(1);
+    if (uid) pingQ = pingQ.eq('user_id', uid);
     var testRes = await Promise.race([
-      _sb.from('settings').select('id').eq('user_id', CURRENT_USER_ID).limit(1),
+      pingQ,
       new Promise(function(_, reject) {
         setTimeout(function() { reject(new Error('Connection timed out after 8 seconds')); }, 8000);
       })
@@ -3249,12 +3261,14 @@ async function loadAllData() {
     }
 
     // Sessions
-    var sessRes = await _sb.from('sessions').select('*').eq('user_id', CURRENT_USER_ID);
+    var sessQ = _sb.from('sessions').select('*'); if (uid) sessQ = sessQ.eq('user_id', uid);
+    var sessRes = await sessQ;
     if (sessRes.error) throw new Error('sessions: ' + sessRes.error.message);
     DB.sessions = sessRes.data || [];
 
     // Attendance
-    var attRes = await _sb.from('attendance').select('*').eq('user_id', CURRENT_USER_ID);
+    var attQ = _sb.from('attendance').select('*'); if (uid) attQ = attQ.eq('user_id', uid);
+    var attRes = await attQ;
     if (attRes.error) throw new Error('attendance: ' + attRes.error.message);
     DB.attendance = {};
     (attRes.data || []).forEach(function(r) {
@@ -3267,17 +3281,20 @@ async function loadAllData() {
     });
 
     // Plans
-    var plansRes = await _sb.from('plans').select('*').eq('user_id', CURRENT_USER_ID);
+    var plansQ = _sb.from('plans').select('*'); if (uid) plansQ = plansQ.eq('user_id', uid);
+    var plansRes = await plansQ;
     if (plansRes.error) throw new Error('plans: ' + plansRes.error.message);
     DB.plans = plansRes.data || [];
 
     // Templates
-    var tmplRes = await _sb.from('templates').select('*').eq('user_id', CURRENT_USER_ID);
+    var tmplQ = _sb.from('templates').select('*'); if (uid) tmplQ = tmplQ.eq('user_id', uid);
+    var tmplRes = await tmplQ;
     if (tmplRes.error) throw new Error('templates: ' + tmplRes.error.message);
     DB.templates = tmplRes.data || [];
 
     // Rounds
-    var roundsRes = await _sb.from('rounds').select('*').eq('user_id', CURRENT_USER_ID);
+    var roundsQ = _sb.from('rounds').select('*'); if (uid) roundsQ = roundsQ.eq('user_id', uid);
+    var roundsRes = await roundsQ;
     if (roundsRes.error) throw new Error('rounds: ' + roundsRes.error.message);
     DB.rounds = (roundsRes.data || []).map(function(r) {
       return Object.assign({}, r, {
@@ -3288,7 +3305,8 @@ async function loadAllData() {
     });
 
     // Settings
-    var setRes = await _sb.from('settings').select('*').eq('user_id', CURRENT_USER_ID);
+    var setQ = _sb.from('settings').select('*'); if (uid) setQ = setQ.eq('user_id', uid);
+    var setRes = await setQ;
     if (setRes.error) throw new Error('settings: ' + setRes.error.message);
     DB.settings = {};
     (setRes.data || []).forEach(function(r) {
@@ -3297,7 +3315,9 @@ async function loadAllData() {
     });
 
     // Security Incidents
-    var siRes = await _sb.from('security_incidents').select('*').eq('user_id', CURRENT_USER_ID).order('created', {ascending: false});
+    var siQ = _sb.from('security_incidents').select('*').order('created', {ascending: false});
+    if (uid) siQ = siQ.eq('user_id', uid);
+    var siRes = await siQ;
     if (siRes.error) throw new Error('security_incidents: ' + siRes.error.message);
     SEC_INCIDENTS = siRes.data || [];
 
@@ -4185,7 +4205,7 @@ async function saveRoundReportToSupabase(round) {
       uploaded_by: round.inspector,
       created: round.created
     };
-    if (CURRENT_USER_ID) doc.user_id = CURRENT_USER_ID;
+    var uid = realUserId(); if (uid) doc.user_id = uid;
     await _sb.from('knowledge_base').upsert(doc);
   } catch(e) {
     console.error('Failed to save round report to Supabase:', e.message);
@@ -5126,7 +5146,7 @@ document.addEventListener("DOMContentLoaded", function(){ initTheme(); init(); }
 
 async function saveSecIncidentDB(incident) {
   try {
-    if (CURRENT_USER_ID) incident = Object.assign({}, incident, {user_id: CURRENT_USER_ID});
+    var uid = realUserId(); if (uid) incident = Object.assign({}, incident, {user_id: uid});
     var res = await _sb.from('security_incidents').insert(incident);
     if (res.error) throw res.error;
   } catch(e) {
@@ -5142,7 +5162,10 @@ var KB_HISTORY = [];
 
 async function kbLoadFromSupabase() {
   try {
-    var res = await _sb.from('knowledge_base').select('*').eq('user_id', CURRENT_USER_ID).order('created', {ascending: false});
+    var uid = realUserId();
+    var q = _sb.from('knowledge_base').select('*').order('created', {ascending: false});
+    if (uid) q = q.eq('user_id', uid);
+    var res = await q;
     if (res.error) throw res.error;
     KB_DOCS = res.data || [];
     kbRender(KB_DOCS);
@@ -5179,7 +5202,7 @@ async function kbHandleUpload(input) {
         uploaded_by: (DB.settings && DB.settings.username) ? DB.settings.username : 'Staff',
         created: new Date().toISOString()
       };
-      if (CURRENT_USER_ID) doc = Object.assign({}, doc, {user_id: CURRENT_USER_ID});
+      var uid = realUserId(); if (uid) doc = Object.assign({}, doc, {user_id: uid});
       var saveRes = await _sb.from('knowledge_base').insert(doc);
       if (saveRes.error) throw saveRes.error;
       KB_DOCS.unshift(doc);
@@ -5320,7 +5343,7 @@ async function tlibHandleUpload(input) {
         uploaded_by: (DB.settings && DB.settings.username) ? DB.settings.username : 'Staff',
         created: new Date().toISOString()
       };
-      if (CURRENT_USER_ID) doc = Object.assign({}, doc, {user_id: CURRENT_USER_ID});
+      var uid = realUserId(); if (uid) doc = Object.assign({}, doc, {user_id: uid});
       var saveRes = await _sb.from('knowledge_base').insert(doc);
       if (saveRes.error) throw saveRes.error;
       TLIB_DOCS.unshift(doc);
