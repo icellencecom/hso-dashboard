@@ -4971,8 +4971,8 @@ async function handleAuthSubmit(e) {
   errEl.style.color = '#f87171';
 
   // ── Admin bypass (works without Supabase Auth configured) ──
-  if (email === 'admin' && pass === '12345678') {
-    CURRENT_USER    = {id: 'admin-local', email: 'admin'};
+  if (email === 'admin@icellence.com' && pass === '12345678') {
+    CURRENT_USER    = {id: 'admin-local', email: 'admin@icellence.com'};
     CURRENT_USER_ID = 'admin-local';
     var initEl = document.getElementById('nav-initials');
     if (initEl) initEl.textContent = 'A';
