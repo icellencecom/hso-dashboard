@@ -3,10 +3,23 @@
 <head>
 <meta name="color-scheme" content="dark"><meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>Hospital Safety Officer</title>
+<title>HSO Platform</title>
+<!-- PWA -->
+<link rel="manifest" href="manifest.json"/>
+<meta name="theme-color" content="#22c55e"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="apple-mobile-web-app-title" content="HSO"/>
+<link rel="apple-touch-icon" href="icon-192.png"/>
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png"/>
+<link rel="shortcut icon" href="favicon.ico"/>
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@700;800;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<!-- Dependencies -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 var supabase=(function(e){function t(e,t){var n={};for(var r in e)Object.prototype.hasOwnProperty.call(e,r)&&t.indexOf(r)<0&&(n[r]=e[r]);if(e!=null&&typeof Object.getOwnPropertySymbols==`function`)for(var i=0,r=Object.getOwnPropertySymbols(e);i<r.length;i++)t.indexOf(r[i])<0&&Object.prototype.propertyIsEnumerable.call(e,r[i])&&(n[r[i]]=e[r[i]]);return n}function n(e,t,n,r){function i(e){return e instanceof n?e:new n(function(t){t(e)})}return new(n||=Promise)(function(n,a){function o(e){try{c(r.next(e))}catch(e){a(e)}}function s(e){try{c(r.throw(e))}catch(e){a(e)}}function c(e){e.done?n(e.value):i(e.value).then(o,s)}c((r=r.apply(e,t||[])).next())})}let r=e=>e?(...t)=>e(...t):(...e)=>fetch(...e);var i=class extends Error{constructor(e,t=`FunctionsError`,n){super(e),this.name=t,this.context=n}},a=class extends i{constructor(e){super(`Failed to send a request to the Edge Function`,`FunctionsFetchError`,e)}},o=class extends i{constructor(e){super(`Relay Error invoking the Edge Function`,`FunctionsRelayError`,e)}},s=class extends i{constructor(e){super(`Edge Function returned a non-2xx status code`,`FunctionsHttpError`,e)}},c;(function(e){e.Any=`any`,e.ApNortheast1=`ap-northeast-1`,e.ApNortheast2=`ap-northeast-2`,e.ApSouth1=`ap-south-1`,e.ApSoutheast1=`ap-southeast-1`,e.ApSoutheast2=`ap-southeast-2`,e.CaCentral1=`ca-central-1`,e.EuCentral1=`eu-central-1`,e.EuWest1=`eu-west-1`,e.EuWest2=`eu-west-2`,e.EuWest3=`eu-west-3`,e.SaEast1=`sa-east-1`,e.UsEast1=`us-east-1`,e.UsWest1=`us-west-1`,e.UsWest2=`us-west-2`})(c||={});var l=class{constructor(e,{headers:t={},customFetch:n,region:i=c.Any}={}){this.url=e,this.headers=t,this.region=i,this.fetch=r(n)}setAuth(e){this.headers.Authorization=`Bearer ${e}`}invoke(e){return n(this,arguments,void 0,function*(e,t={}){let n,r;try{let{headers:i,method:c,body:l,signal:u,timeout:d}=t,f={},{region:p}=t;p||=this.region;let m=new URL(`${this.url}/${e}`);p&&p!==`any`&&(f[`x-region`]=p,m.searchParams.set(`forceFunctionRegion`,p));let h;l&&(i&&!Object.prototype.hasOwnProperty.call(i,`Content-Type`)||!i)?typeof Blob<`u`&&l instanceof Blob||l instanceof ArrayBuffer?(f[`Content-Type`]=`application/octet-stream`,h=l):typeof l==`string`?(f[`Content-Type`]=`text/plain`,h=l):typeof FormData<`u`&&l instanceof FormData?h=l:(f[`Content-Type`]=`application/json`,h=JSON.stringify(l)):h=l&&typeof l!=`string`&&!(typeof Blob<`u`&&l instanceof Blob)&&!(l instanceof ArrayBuffer)&&!(typeof FormData<`u`&&l instanceof FormData)?JSON.stringify(l):l;let g=u;d&&(r=new AbortController,n=setTimeout(()=>r.abort(),d),u?(g=r.signal,u.addEventListener(`abort`,()=>r.abort())):g=r.signal);let _=yield this.fetch(m.toString(),{method:c||`POST`,headers:Object.assign(Object.assign(Object.assign({},f),this.headers),i),body:h,signal:g}).catch(e=>{throw new a(e)}),ee=_.headers.get(`x-relay-error`);if(ee&&ee===`true`)throw new o(_);if(!_.ok)throw new s(_);let v=(_.headers.get(`Content-Type`)??`text/plain`).split(`;`)[0].trim(),te;return te=v===`application/json`?yield _.json():v===`application/octet-stream`||v===`application/pdf`?yield _.blob():v===`text/event-stream`?_:v===`multipart/form-data`?yield _.formData():yield _.text(),{data:te,error:null,response:_}}catch(e){return{data:null,error:e,response:e instanceof s||e instanceof o?e.context:void 0}}finally{n&&clearTimeout(n)}})}},u=class extends Error{constructor(e){super(e.message),this.name=`PostgrestError`,this.details=e.details,this.hint=e.hint,this.code=e.code}},d=class{constructor(e){this.shouldThrowOnError=!1,this.method=e.method,this.url=e.url,this.headers=new Headers(e.headers),this.schema=e.schema,this.body=e.body,this.shouldThrowOnError=e.shouldThrowOnError??!1,this.signal=e.signal,this.isMaybeSingle=e.isMaybeSingle??!1,this.urlLengthLimit=e.urlLengthLimit??8e3,e.fetch?this.fetch=e.fetch:this.fetch=fetch}throwOnError(){return this.shouldThrowOnError=!0,this}setHeader(e,t){return this.headers=new Headers(this.headers),this.headers.set(e,t),this}then(e,t){var n=this;this.schema===void 0||([`GET`,`HEAD`].includes(this.method)?this.headers.set(`Accept-Profile`,this.schema):this.headers.set(`Content-Profile`,this.schema)),this.method!==`GET`&&this.method!==`HEAD`&&this.headers.set(`Content-Type`,`application/json`);let r=this.fetch,i=r(this.url.toString(),{method:this.method,headers:this.headers,body:JSON.stringify(this.body),signal:this.signal}).then(async e=>{let t=null,r=null,i=null,a=e.status,o=e.statusText;if(e.ok){if(n.method!==`HEAD`){let t=await e.text();t===``||(r=n.headers.get(`Accept`)===`text/csv`||n.headers.get(`Accept`)&&n.headers.get(`Accept`)?.includes(`application/vnd.pgrst.plan+text`)?t:JSON.parse(t))}let s=n.headers.get(`Prefer`)?.match(/count=(exact|planned|estimated)/),c=e.headers.get(`content-range`)?.split(`/`);s&&c&&c.length>1&&(i=parseInt(c[1])),n.isMaybeSingle&&n.method===`GET`&&Array.isArray(r)&&(r.length>1?(t={code:`PGRST116`,details:`Results contain ${r.length} rows, application/vnd.pgrst.object+json requires 1 row`,hint:null,message:`JSON object requested, multiple (or no) rows returned`},r=null,i=null,a=406,o=`Not Acceptable`):r=r.length===1?r[0]:null)}else{var s;let i=await e.text();try{t=JSON.parse(i),Array.isArray(t)&&e.status===404&&(r=[],t=null,a=200,o=`OK`)}catch{e.status===404&&i===``?(a=204,o=`No Content`):t={message:i}}if(t&&n.isMaybeSingle&&!(t==null||(s=t.details)==null)&&s.includes(`0 rows`)&&(t=null,a=200,o=`OK`),t&&n.shouldThrowOnError)throw new u(t)}return{error:t,data:r,count:i,status:a,statusText:o}});return this.shouldThrowOnError||(i=i.catch(e=>{let t=``,n=``,r=``,i=e?.cause;if(i){let n=i?.message??``,r=i?.code??``;t=`${e?.name??`FetchError`}: ${e?.message}`,t+=`\n\nCaused by: ${i?.name??`Error`}: ${n}`,r&&(t+=` (${r})`),i?.stack&&(t+=`\n${i.stack}`)}else t=e?.stack??``;let a=this.url.toString().length;return e?.name===`AbortError`||e?.code===`ABORT_ERR`?(r=``,n=`Request was aborted (timeout or manual cancellation)`,a>this.urlLengthLimit&&(n+=`. Note: Your request URL is ${a} characters, which may exceed server limits. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [many IDs])), consider using an RPC function to pass values server-side.`)):(i?.name===`HeadersOverflowError`||i?.code===`UND_ERR_HEADERS_OVERFLOW`)&&(r=``,n=`HTTP headers exceeded server limits (typically 16KB)`,a>this.urlLengthLimit&&(n+=`. Your request URL is ${a} characters. If selecting many fields, consider using views. If filtering with large arrays (e.g., .in('id', [200+ IDs])), consider using an RPC function instead.`)),{error:{message:`${e?.name??`FetchError`}: ${e?.message}`,details:t,hint:n,code:r},data:null,count:null,status:0,statusText:``}})),i.then(e,t)}returns(){return this}overrideTypes(){return this}},f=class extends d{select(e){let t=!1,n=(e??`*`).split(``).map(e=>/\s/.test(e)&&!t?``:(e===`"`&&(t=!t),e)).join(``);return this.url.searchParams.set(`select`,n),this.headers.append(`Prefer`,`return=representation`),this}order(e,{ascending:t=!0,nullsFirst:n,foreignTable:r,referencedTable:i=r}={}){let a=i?`${i}.order`:`order`,o=this.url.searchParams.get(a);return this.url.searchParams.set(a,`${o?`${o},`:``}${e}.${t?`asc`:`desc`}${n===void 0?``:n?`.nullsfirst`:`.nullslast`}`),this}limit(e,{foreignTable:t,referencedTable:n=t}={}){let r=n===void 0?`limit`:`${n}.limit`;return this.url.searchParams.set(r,`${e}`),this}range(e,t,{foreignTable:n,referencedTable:r=n}={}){let i=r===void 0?`offset`:`${r}.offset`,a=r===void 0?`limit`:`${r}.limit`;return this.url.searchParams.set(i,`${e}`),this.url.searchParams.set(a,`${t-e+1}`),this}abortSignal(e){return this.signal=e,this}single(){return this.headers.set(`Accept`,`application/vnd.pgrst.object+json`),this}maybeSingle(){return this.method===`GET`?this.headers.set(`Accept`,`application/json`):this.headers.set(`Accept`,`application/vnd.pgrst.object+json`),this.isMaybeSingle=!0,this}csv(){return this.headers.set(`Accept`,`text/csv`),this}geojson(){return this.headers.set(`Accept`,`application/geo+json`),this}explain({analyze:e=!1,verbose:t=!1,settings:n=!1,buffers:r=!1,wal:i=!1,format:a=`text`}={}){let o=[e?`analyze`:null,t?`verbose`:null,n?`settings`:null,r?`buffers`:null,i?`wal`:null].filter(Boolean).join(`|`),s=this.headers.get(`Accept`)??`application/json`;return this.headers.set(`Accept`,`application/vnd.pgrst.plan+${a}; for="${s}"; options=${o};`),this}rollback(){return this.headers.append(`Prefer`,`tx=rollback`),this}returns(){return this}maxAffected(e){return this.headers.append(`Prefer`,`handling=strict`),this.headers.append(`Prefer`,`max-affected=${e}`),this}};let p=RegExp(`[,()]`);var m=class extends f{eq(e,t){return this.url.searchParams.append(e,`eq.${t}`),this}neq(e,t){return this.url.searchParams.append(e,`neq.${t}`),this}gt(e,t){return this.url.searchParams.append(e,`gt.${t}`),this}gte(e,t){return this.url.searchParams.append(e,`gte.${t}`),this}lt(e,t){return this.url.searchParams.append(e,`lt.${t}`),this}lte(e,t){return this.url.searchParams.append(e,`lte.${t}`),this}like(e,t){return this.url.searchParams.append(e,`like.${t}`),this}likeAllOf(e,t){return this.url.searchParams.append(e,`like(all).{${t.join(`,`)}}`),this}likeAnyOf(e,t){return this.url.searchParams.append(e,`like(any).{${t.join(`,`)}}`),this}ilike(e,t){return this.url.searchParams.append(e,`ilike.${t}`),this}ilikeAllOf(e,t){return this.url.searchParams.append(e,`ilike(all).{${t.join(`,`)}}`),this}ilikeAnyOf(e,t){return this.url.searchParams.append(e,`ilike(any).{${t.join(`,`)}}`),this}regexMatch(e,t){return this.url.searchParams.append(e,`match.${t}`),this}regexIMatch(e,t){return this.url.searchParams.append(e,`imatch.${t}`),this}is(e,t){return this.url.searchParams.append(e,`is.${t}`),this}isDistinct(e,t){return this.url.searchParams.append(e,`isdistinct.${t}`),this}in(e,t){let n=Array.from(new Set(t)).map(e=>typeof e==`string`&&p.test(e)?`"${e}"`:`${e}`).join(`,`);return this.url.searchParams.append(e,`in.(${n})`),this}notIn(e,t){let n=Array.from(new Set(t)).map(e=>typeof e==`string`&&p.test(e)?`"${e}"`:`${e}`).join(`,`);return this.url.searchParams.append(e,`not.in.(${n})`),this}contains(e,t){return typeof t==`string`?this.url.searchParams.append(e,`cs.${t}`):Array.isArray(t)?this.url.searchParams.append(e,`cs.{${t.join(`,`)}}`):this.url.searchParams.append(e,`cs.${JSON.stringify(t)}`),this}containedBy(e,t){return typeof t==`string`?this.url.searchParams.append(e,`cd.${t}`):Array.isArray(t)?this.url.searchParams.append(e,`cd.{${t.join(`,`)}}`):this.url.searchParams.append(e,`cd.${JSON.stringify(t)}`),this}rangeGt(e,t){return this.url.searchParams.append(e,`sr.${t}`),this}rangeGte(e,t){return this.url.searchParams.append(e,`nxl.${t}`),this}rangeLt(e,t){return this.url.searchParams.append(e,`sl.${t}`),this}rangeLte(e,t){return this.url.searchParams.append(e,`nxr.${t}`),this}rangeAdjacent(e,t){return this.url.searchParams.append(e,`adj.${t}`),this}overlaps(e,t){return typeof t==`string`?this.url.searchParams.append(e,`ov.${t}`):this.url.searchParams.append(e,`ov.{${t.join(`,`)}}`),this}textSearch(e,t,{config:n,type:r}={}){let i=``;r===`plain`?i=`pl`:r===`phrase`?i=`ph`:r===`websearch`&&(i=`w`);let a=n===void 0?``:`(${n})`;return this.url.searchParams.append(e,`${i}fts${a}.${t}`),this}match(e){return Object.entries(e).forEach(([e,t])=>{this.url.searchParams.append(e,`eq.${t}`)}),this}not(e,t,n){return this.url.searchParams.append(e,`not.${t}.${n}`),this}or(e,{foreignTable:t,referencedTable:n=t}={}){let r=n?`${n}.or`:`or`;return this.url.searchParams.append(r,`(${e})`),this}filter(e,t,n){return this.url.searchParams.append(e,`${t}.${n}`),this}},h=class{constructor(e,{headers:t={},schema:n,fetch:r,urlLengthLimit:i=8e3}){this.url=e,this.headers=new Headers(t),this.schema=n,this.fetch=r,this.urlLengthLimit=i}cloneRequestState(){return{url:new URL(this.url.toString()),headers:new Headers(this.headers)}}select(e,t){let{head:n=!1,count:r}=t??{},i=n?`HEAD`:`GET`,a=!1,o=(e??`*`).split(``).map(e=>/\s/.test(e)&&!a?``:(e===`"`&&(a=!a),e)).join(``),{url:s,headers:c}=this.cloneRequestState();return s.searchParams.set(`select`,o),r&&c.append(`Prefer`,`count=${r}`),new m({method:i,url:s,headers:c,schema:this.schema,fetch:this.fetch,urlLengthLimit:this.urlLengthLimit})}insert(e,{count:t,defaultToNull:n=!0}={}){let{url:r,headers:i}=this.cloneRequestState();if(t&&i.append(`Prefer`,`count=${t}`),n||i.append(`Prefer`,`missing=default`),Array.isArray(e)){let t=e.reduce((e,t)=>e.concat(Object.keys(t)),[]);if(t.length>0){let e=[...new Set(t)].map(e=>`"${e}"`);r.searchParams.set(`columns`,e.join(`,`))}}return new m({method:`POST`,url:r,headers:i,schema:this.schema,body:e,fetch:this.fetch??fetch,urlLengthLimit:this.urlLengthLimit})}upsert(e,{onConflict:t,ignoreDuplicates:n=!1,count:r,defaultToNull:i=!0}={}){let{url:a,headers:o}=this.cloneRequestState();if(o.append(`Prefer`,`resolution=${n?`ignore`:`merge`}-duplicates`),t!==void 0&&a.searchParams.set(`on_conflict`,t),r&&o.append(`Prefer`,`count=${r}`),i||o.append(`Prefer`,`missing=default`),Array.isArray(e)){let t=e.reduce((e,t)=>e.concat(Object.keys(t)),[]);if(t.length>0){let e=[...new Set(t)].map(e=>`"${e}"`);a.searchParams.set(`columns`,e.join(`,`))}}return new m({method:`POST`,url:a,headers:o,schema:this.schema,body:e,fetch:this.fetch??fetch,urlLengthLimit:this.urlLengthLimit})}update(e,{count:t}={}){let{url:n,headers:r}=this.cloneRequestState();return t&&r.append(`Prefer`,`count=${t}`),new m({method:`PATCH`,url:n,headers:r,schema:this.schema,body:e,fetch:this.fetch??fetch,urlLengthLimit:this.urlLengthLimit})}delete({count:e}={}){let{url:t,headers:n}=this.cloneRequestState();return e&&n.append(`Prefer`,`count=${e}`),new m({method:`DELETE`,url:t,headers:n,schema:this.schema,fetch:this.fetch??fetch,urlLengthLimit:this.urlLengthLimit})}};function g(e){"@babel/helpers - typeof";return g=typeof Symbol==`function`&&typeof Symbol.iterator==`symbol`?function(e){return typeof e}:function(e){return e&&typeof Symbol==`function`&&e.constructor===Symbol&&e!==Symbol.prototype?`symbol`:typeof e},g(e)}function _(e,t){if(g(e)!=`object`||!e)return e;var n=e[Symbol.toPrimitive];if(n!==void 0){var r=n.call(e,t||`default`);if(g(r)!=`object`)return r;throw TypeError(`@@toPrimitive must return a primitive value.`)}return(t===`string`?String:Number)(e)}function ee(e){var t=_(e,`string`);return g(t)==`symbol`?t:t+``}function v(e,t,n){return(t=ee(t))in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function te(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter(function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable})),n.push.apply(n,r)}return n}function ne(e){for(var t=1;t<arguments.length;t++){var n=arguments[t]==null?{}:arguments[t];t%2?te(Object(n),!0).forEach(function(t){v(e,t,n[t])}):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):te(Object(n)).forEach(function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))})}return e}var re=class e{constructor(e,{headers:t={},schema:n,fetch:r,timeout:i,urlLengthLimit:a=8e3}={}){this.url=e,this.headers=new Headers(t),this.schemaName=n,this.urlLengthLimit=a;let o=r??globalThis.fetch;i!==void 0&&i>0?this.fetch=(e,t)=>{let n=new AbortController,r=setTimeout(()=>n.abort(),i),a=t?.signal;if(a){if(a.aborted)return clearTimeout(r),o(e,t);let i=()=>{clearTimeout(r),n.abort()};return a.addEventListener(`abort`,i,{once:!0}),o(e,ne(ne({},t),{},{signal:n.signal})).finally(()=>{clearTimeout(r),a.removeEventListener(`abort`,i)})}return o(e,ne(ne({},t),{},{signal:n.signal})).finally(()=>clearTimeout(r))}:this.fetch=o}from(e){if(!e||typeof e!=`string`||e.trim()===``)throw Error(`Invalid relation name: relation must be a non-empty string.`);return new h(new URL(`${this.url}/${e}`),{headers:new Headers(this.headers),schema:this.schemaName,fetch:this.fetch,urlLengthLimit:this.urlLengthLimit})}schema(t){return new e(this.url,{headers:this.headers,schema:t,fetch:this.fetch,urlLengthLimit:this.urlLengthLimit})}rpc(e,t={},{head:n=!1,get:r=!1,count:i}={}){let a,o=new URL(`${this.url}/rpc/${e}`),s,c=e=>typeof e==`object`&&!!e&&(!Array.isArray(e)||e.some(c)),l=n&&Object.values(t).some(c);l?(a=`POST`,s=t):n||r?(a=n?`HEAD`:`GET`,Object.entries(t).filter(([e,t])=>t!==void 0).map(([e,t])=>[e,Array.isArray(t)?`{${t.join(`,`)}}`:`${t}`]).forEach(([e,t])=>{o.searchParams.append(e,t)})):(a=`POST`,s=t);let u=new Headers(this.headers);return l?u.set(`Prefer`,i?`count=${i},return=minimal`:`return=minimal`):i&&u.set(`Prefer`,`count=${i}`),new m({method:a,url:o,headers:u,schema:this.schemaName,body:s,fetch:this.fetch??fetch,urlLengthLimit:this.urlLengthLimit})}},ie=class{constructor(){}static detectEnvironment(){if(typeof WebSocket<`u`)return{type:`native`,constructor:WebSocket};if(typeof globalThis<`u`&&globalThis.WebSocket!==void 0)return{type:`native`,constructor:globalThis.WebSocket};if(typeof global<`u`&&global.WebSocket!==void 0)return{type:`native`,constructor:global.WebSocket};if(typeof globalThis<`u`&&globalThis.WebSocketPair!==void 0&&globalThis.WebSocket===void 0)return{type:`cloudflare`,error:`Cloudflare Workers detected. WebSocket clients are not supported in Cloudflare Workers.`,workaround:`Use Cloudflare Workers WebSocket API for server-side WebSocket handling, or deploy to a different runtime.`};if(typeof globalThis<`u`&&globalThis.EdgeRuntime||typeof navigator<`u`&&navigator.userAgent?.includes(`Vercel-Edge`))return{type:`unsupported`,error:`Edge runtime detected (Vercel Edge/Netlify Edge). WebSockets are not supported in edge functions.`,workaround:`Use serverless functions or a different deployment target for WebSocket functionality.`};let e=globalThis.process;if(e){let t=e.versions;if(t&&t.node){let e=t.node,n=parseInt(e.replace(/^v/,``).split(`.`)[0]);return n>=22?globalThis.WebSocket===void 0?{type:`unsupported`,error:`Node.js ${n} detected but native WebSocket not found.`,workaround:`Provide a WebSocket implementation via the transport option.`}:{type:`native`,constructor:globalThis.WebSocket}:{type:`unsupported`,error:`Node.js ${n} detected without native WebSocket support.`,workaround:`For Node.js < 22, install "ws" package and provide it via the transport option:
 import ws from "ws"
@@ -487,7 +500,53 @@ textarea{resize:vertical;min-height:76px;}
   }
   @supports (padding-bottom: env(safe-area-inset-bottom)) {
     .view { padding-bottom: calc(80px + env(safe-area-inset-bottom)); }
+    .bottom-nav { padding-bottom: env(safe-area-inset-bottom); }
   }
+
+  /* ── Bottom Mobile Nav ───────────────────────────────────── */
+  .bottom-nav {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0; z-index: 900;
+    background: var(--s2); border-top: 1px solid var(--bd);
+    flex-direction: row; justify-content: space-around; align-items: stretch;
+    height: 60px;
+  }
+  .bottom-nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    justify-content: center; gap: 3px; background: none; border: none;
+    color: var(--t3); font-size: 9px; font-weight: 700; letter-spacing: .03em;
+    text-transform: uppercase; cursor: pointer; padding: 6px 4px;
+    transition: color .15s;
+  }
+  .bottom-nav-btn svg { width: 22px; height: 22px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .bottom-nav-btn.active { color: var(--green); }
+  .bottom-nav-btn:active { opacity: .7; }
+  @media (max-width: 640px) {
+    .bottom-nav { display: flex; }
+    .topbar .menu-btn { display: none; }
+    .view.active { padding-bottom: calc(68px + env(safe-area-inset-bottom, 0px)); }
+  }
+
+  /* ── PWA Install Banner ──────────────────────────────────── */
+  #install-banner {
+    display: none; position: fixed; bottom: 64px; left: 12px; right: 12px; z-index: 950;
+    background: var(--s2); border: 1.5px solid var(--green); border-radius: 14px;
+    padding: 14px 16px; gap: 12px; align-items: center;
+    box-shadow: 0 4px 24px rgba(0,0,0,.4);
+  }
+  #install-banner.visible { display: flex; }
+  #install-banner .install-icon { font-size: 28px; flex-shrink: 0; }
+  #install-banner .install-text { flex: 1; }
+  #install-banner .install-text strong { display: block; font-size: 13px; color: var(--t1); margin-bottom: 2px; }
+  #install-banner .install-text span { font-size: 11px; color: var(--t3); }
+  #install-banner .install-btn { background: var(--green); color: #fff; border: none; border-radius: 9px; padding: 8px 16px; font-size: 13px; font-weight: 700; cursor: pointer; flex-shrink: 0; }
+  #install-banner .install-close { background: none; border: none; color: var(--t3); font-size: 20px; cursor: pointer; padding: 4px; flex-shrink: 0; }
+
+  /* ── Role badge ──────────────────────────────────────────── */
+  .role-badge { display:inline-block; font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; padding:2px 8px; border-radius:20px; }
+  .role-admin { background:rgba(255,75,75,.15); color:var(--red); }
+  .role-safety_officer { background:rgba(34,197,94,.15); color:var(--green); }
+  .role-staff { background:rgba(255,255,255,.08); color:var(--t3); }
 
   </style>
 </head>
@@ -536,6 +595,41 @@ textarea{resize:vertical;min-height:76px;}
     <div class="nav-av" id="nav-initials" onclick="showView('settings')" title="Settings">JM</div>
     <button class="logout-btn" onclick="doLogout()" title="Sign out">⏻</button>
   </div>
+</div>
+
+<!-- ══ Bottom Mobile Navigation ══════════════════════════════ -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="bottom-nav-btn active" id="bnav-dashboard" onclick="showView('dashboard');bnav('dashboard')">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    Home
+  </button>
+  <button class="bottom-nav-btn" id="bnav-rounds" onclick="showView('rounds');bnav('rounds')">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    Rounds
+  </button>
+  <button class="bottom-nav-btn" id="bnav-training" onclick="showView('training');bnav('training')">
+    <svg viewBox="0 0 24 24"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg>
+    Training
+  </button>
+  <button class="bottom-nav-btn" id="bnav-kb" onclick="showView('kb');bnav('kb')">
+    <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+    Library
+  </button>
+  <button class="bottom-nav-btn" id="bnav-settings" onclick="showView('settings');bnav('settings')">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+    Settings
+  </button>
+</nav>
+
+<!-- ══ PWA Install Banner ═════════════════════════════════════ -->
+<div id="install-banner">
+  <span class="install-icon">🏥</span>
+  <div class="install-text">
+    <strong>Install HSO Platform</strong>
+    <span>Add to your home screen for quick access</span>
+  </div>
+  <button class="install-btn" onclick="triggerInstall()">Install</button>
+  <button class="install-close" onclick="dismissInstall()">×</button>
 </div>
 
 
@@ -2336,7 +2430,37 @@ textarea{resize:vertical;min-height:76px;}
         <div class="field"><label>Your Name</label><input type="text" id="set-username" placeholder="Jason McClaren" oninput="saveSettings()"></div>
         <div class="field"><label>Your Title</label><input type="text" id="set-usertitle" placeholder="HSO, CHSP" oninput="saveSettings()"></div>
       </div>
-      <div style="margin-top:13px;"><button class="btn btn-primary" onclick="saveSettings();alert('Saved!')">Save Changes</button></div>
+      <div style="margin-top:8px;font-size:12px;color:var(--t3);">
+        Role: <span id="set-role-display" class="role-badge role-staff">staff</span>
+      </div>
+      <div style="margin-top:13px;"><button class="btn btn-primary" onclick="saveSettings();showToast('Settings saved!','success')">Save Changes</button></div>
+    </div>
+
+    <!-- ── EmailJS — Real Email Sending ── -->
+    <div class="scard">
+      <div class="scard-t">Email Integration <span style="font-size:11px;font-weight:400;color:var(--t3);">(EmailJS — free, no server needed)</span></div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:12px;">
+        Connect <a href="https://www.emailjs.com" target="_blank" style="color:var(--green);">EmailJS</a> to send real certificates and reports by email.
+        Create a free account → Add Email Service → Create Template → copy keys below.
+      </p>
+      <div class="fgrid">
+        <div class="field fcol"><label>Public Key</label><input type="text" id="set-ejs-pk" placeholder="user_xxxxxxxxxxxx" oninput="saveEmailJSSettings()"></div>
+        <div class="field"><label>Service ID</label><input type="text" id="set-ejs-svc" placeholder="service_xxxxxxx" oninput="saveEmailJSSettings()"></div>
+        <div class="field"><label>Template ID</label><input type="text" id="set-ejs-tpl" placeholder="template_xxxxxxx" oninput="saveEmailJSSettings()"></div>
+      </div>
+      <div id="ejs-status" style="font-size:12px;margin-top:8px;color:var(--t3);">Status: not configured — emails will open your mail client instead</div>
+    </div>
+
+    <!-- ── Admin: User Management ── -->
+    <div class="scard" id="admin-users-card" style="display:none;">
+      <div class="scard-t" style="display:flex;align-items:center;justify-content:space-between;">
+        User Management
+        <button class="btn btn-ghost btn-sm" onclick="loadAllUsers()">↻ Refresh</button>
+      </div>
+      <p style="font-size:12px;color:var(--t3);margin-bottom:12px;">Manage staff roles. Admins have full access. Safety Officers can view all rounds.</p>
+      <div id="users-list">
+        <div style="text-align:center;padding:24px;color:var(--t3);font-size:13px;">Loading users…</div>
+      </div>
     </div>
   </div>
 </div>
@@ -2482,8 +2606,17 @@ Resources:`;for(let t of c){if(!t||typeof t!=`string`)throw Error(`@supabase/aut
 var SUPABASE_URL = 'https://hpvnqnahwvcxwkjejcvz.supabase.co';
 var SUPABASE_KEY = 'sb_publishable_oOOfYCAk9f-aPbIDKP3KMA_G4__10TI';
 var _sb = (typeof supabase !== 'undefined') ? supabase.createClient(SUPABASE_URL, SUPABASE_KEY) : null;
+
+// ── EmailJS config (set in Settings → Email tab or hardcode below) ──
+var EMAILJS_PUBLIC_KEY  = '';  // e.g. 'user_xxxxxxxxxx'
+var EMAILJS_SERVICE_ID  = '';  // e.g. 'service_xxxxxxx'
+var EMAILJS_TEMPLATE_ID = '';  // e.g. 'template_xxxxxxx'
+function ejsReady() { return EMAILJS_PUBLIC_KEY && EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID; }
+
 var CURRENT_USER = null;
 var CURRENT_USER_ID = null;
+var CURRENT_USER_ROLE = 'staff'; // 'admin' | 'safety_officer' | 'staff'
+var CURRENT_USER_PROFILE = null;
 // Returns null for the local admin bypass so DB operations skip the user_id filter/column
 function realUserId() { return (CURRENT_USER_ID && CURRENT_USER_ID !== 'admin-local') ? CURRENT_USER_ID : null; }
 
@@ -2626,7 +2759,51 @@ function loadSettings(){
     document.getElementById('hosp-logo-img').src=DB.settings.hospLogo;
     document.getElementById('hosp-logo-name').textContent=DB.settings.hospLogoName||'logo.png';
   }
+  // Load EmailJS keys
+  f('set-ejs-pk',  DB.settings.ejs_public_key);
+  f('set-ejs-svc', DB.settings.ejs_service_id);
+  f('set-ejs-tpl', DB.settings.ejs_template_id);
+  updateEJSStatus();
+  // Show role badge
+  var roleEl = document.getElementById('set-role-display');
+  if (roleEl) {
+    roleEl.textContent = CURRENT_USER_ROLE.replace('_',' ');
+    roleEl.className = 'role-badge role-' + CURRENT_USER_ROLE.replace('_','-');
+  }
+  // Show user management for admins
+  var adminCard = document.getElementById('admin-users-card');
+  if (adminCard) {
+    adminCard.style.display = isAdmin() ? '' : 'none';
+    if (isAdmin()) loadAllUsers();
+  }
   renderSettingsPlans();renderTemplatesList();
+}
+
+function saveEmailJSSettings() {
+  var pk  = document.getElementById('set-ejs-pk')  ? document.getElementById('set-ejs-pk').value.trim()  : '';
+  var svc = document.getElementById('set-ejs-svc') ? document.getElementById('set-ejs-svc').value.trim() : '';
+  var tpl = document.getElementById('set-ejs-tpl') ? document.getElementById('set-ejs-tpl').value.trim() : '';
+  EMAILJS_PUBLIC_KEY = pk; EMAILJS_SERVICE_ID = svc; EMAILJS_TEMPLATE_ID = tpl;
+  DB.settings.ejs_public_key  = pk;
+  DB.settings.ejs_service_id  = svc;
+  DB.settings.ejs_template_id = tpl;
+  saveSettingKey('ejs_public_key', pk);
+  saveSettingKey('ejs_service_id', svc);
+  saveSettingKey('ejs_template_id', tpl);
+  if (pk && typeof emailjs !== 'undefined') emailjs.init({ publicKey: pk });
+  updateEJSStatus();
+}
+
+function updateEJSStatus() {
+  var el = document.getElementById('ejs-status');
+  if (!el) return;
+  if (ejsReady()) {
+    el.textContent = '✅ EmailJS configured — real emails will be sent';
+    el.style.color = 'var(--green)';
+  } else {
+    el.textContent = 'Status: not configured — emails will open your mail client instead';
+    el.style.color = 'var(--t3)';
+  }
 }
 
 function uploadHospLogo(input){
@@ -2819,25 +2996,88 @@ function updateTrainingStats(){
   function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
   set('ts-s',total);set('ts-a',allA);set('ts-m',thisM);set('ts-q',avg);
   var badge=document.getElementById('dash-training-badge');if(badge)badge.textContent=total;
+  updateDashboardStats();
+}
+
+function updateDashboardStats(){
+  function set(id,v){var el=document.getElementById(id);if(el)el.textContent=v;}
+  // Rounds
+  var rounds=DB.rounds||[];
+  set('stat-rounds',rounds.length);
+  // Sessions
+  set('stat-sessions',DB.sessions.length);
+  // Deficiencies (failed items across all rounds)
+  var totalDef=rounds.reduce(function(acc,r){
+    var s=r.stats||{};return acc+(s.failed||r.deficiencies||0);
+  },0);
+  set('stat-deficiencies',totalDef);
+  // Recent activity badge on rounds
+  var badge=document.getElementById('dash-rounds-badge');if(badge)badge.textContent=rounds.length;
 }
 
 function openSessionDetail(id){
   activeSession=id;
   var s=DB.sessions.find(function(x){return x.id===id;});if(!s)return;
   var recs=DB.attendance[id]||[];
-  document.getElementById('sd-title').textContent=s.title;
-  document.getElementById('sd-meta').textContent=s.category+(s.hours?' · '+s.hours+' CEU hrs':'');
-  document.getElementById('sd-datetime').textContent=fDate(s.date)+(s.time?' · '+fTime(s.time):'');
-  document.getElementById('sd-location').textContent=s.location||'—';
-  document.getElementById('sd-count').textContent=recs.length+(s.capacity?' / '+s.capacity:'');
-  document.getElementById('sd-cat').textContent=s.category||'—';
-  document.getElementById('sd-instructor').textContent=s.instructor||'—';
-  document.getElementById('sd-hours').textContent=s.hours||'—';
-  var descWrap=document.getElementById('sd-desc-wrap');
-  if(s.desc){descWrap.style.display='block';document.getElementById('sd-desc').textContent=s.desc;}
-  else descWrap.style.display='none';
+
+  var titleEl=document.getElementById('sd-title');
+  if(titleEl) titleEl.textContent=s.title;
+
+  var statusColors={scheduled:'var(--blue)',completed:'var(--green)',cancelled:'var(--red)',inprogress:'var(--yellow)'};
+  var sc=statusColors[s.status]||'var(--t3)';
+  var emailCount=(recs.filter(function(a){return a.email&&a.email.trim();})).length;
+
+  var body=document.getElementById('sd-body');
+  if(body){
+    body.innerHTML=
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'+
+        '<span style="font-size:11px;background:'+sc+'22;color:'+sc+';border-radius:999px;padding:3px 12px;font-weight:700;text-transform:capitalize;">'+(s.status||'scheduled')+'</span>'+
+        (s.category?'<span style="font-size:11px;background:var(--s3);color:var(--t2);border-radius:999px;padding:3px 12px;">'+s.category+'</span>':'')+
+        (s.hours?'<span style="font-size:11px;background:var(--s3);color:var(--t2);border-radius:999px;padding:3px 12px;">'+s.hours+' CEU hrs</span>':'')+
+      '</div>'+
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;">'+
+        '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Date &amp; Time</div><div style="font-size:13px;color:var(--t1);">'+fDate(s.date)+(s.time?' · '+fTime(s.time):'')+'</div></div>'+
+        '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Location</div><div style="font-size:13px;color:var(--t1);">'+(s.location||'—')+'</div></div>'+
+        '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Instructor</div><div style="font-size:13px;color:var(--t1);">'+(s.instructor||'—')+'</div></div>'+
+        '<div><div style="font-size:10.5px;color:var(--t3);font-weight:700;text-transform:uppercase;letter-spacing:.05em;margin-bottom:3px;">Attendees</div><div style="font-size:13px;color:var(--t1);">'+recs.length+(s.capacity?' / '+s.capacity:'')+'</div></div>'+
+      '</div>'+
+      (s.desc?'<div style="padding:10px 12px;background:var(--s3);border-radius:8px;margin-bottom:14px;font-size:12px;color:var(--t2);">'+escHtml(s.desc)+'</div>':'')+
+      '<div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;">'+
+        '<button class="btn btn-primary btn-sm" onclick="showQR(\''+id+'\')">📱 QR Code</button>'+
+        '<button class="btn btn-ghost btn-sm" onclick="editSession(\''+id+'\')">✏️ Edit</button>'+
+        (s.status!=='completed'?'<button class="btn btn-green btn-sm" onclick="markSessionComplete(\''+id+'\')">✅ Mark Complete</button>':'')+
+        (recs.length>0&&emailCount>0?'<button class="btn btn-ghost btn-sm" onclick="var _s=DB.sessions.find(function(x){return x.id===\''+id+'\';});sendCertificateEmails(_s,DB.attendance[\''+id+'\']||[]);">📧 Email Certs ('+emailCount+')</button>':'')+
+        '<button class="btn btn-ghost btn-sm" onclick="exportAttendance(\''+id+'\')">⬇ Export</button>'+
+      '</div>'+
+      '<div style="font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Attendance ('+recs.length+')</div>'+
+      '<div id="sd-attendance"></div>'+
+      '<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--bd);">'+
+        '<div style="font-size:10.5px;font-weight:700;color:var(--t3);text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Add Manually</div>'+
+        '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px;">'+
+          '<input type="text" id="ma-name" placeholder="Full Name" class="finp" style="font-size:12px;"/>'+
+          '<input type="text" id="ma-role" placeholder="Role" class="finp" style="font-size:12px;"/>'+
+          '<input type="text" id="ma-dept" placeholder="Department" class="finp" style="font-size:12px;"/>'+
+        '</div>'+
+        '<input type="email" id="ma-email" placeholder="Email (optional)" class="finp" style="font-size:12px;margin-bottom:8px;width:100%;"/>'+
+        '<button class="btn btn-ghost btn-sm" onclick="addManualAttendee()">+ Add Attendee</button>'+
+      '</div>';
+  }
   renderDetailAttendance(recs);
   openModal('sessionDetailModal');
+}
+
+function exportAttendance(sid) {
+  var s=DB.sessions.find(function(x){return x.id===sid;});
+  var recs=DB.attendance[sid]||[];
+  if(!recs.length){showToast('No attendance to export','error');return;}
+  var rows=['Name,Role,Department,Employee ID,Email,Time'];
+  recs.forEach(function(r){
+    rows.push('"'+r.name+'","'+r.role+'","'+r.dept+'","'+(r.eid||'')+'","'+(r.email||'')+'","'+new Date(r.timestamp).toLocaleString()+'"');
+  });
+  var a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(rows.join('\n'));
+  a.download=(s?s.title.replace(/[^a-z0-9]/gi,'_'):'session')+'_attendance.csv';
+  a.click();
 }
 
 function renderDetailAttendance(recs){
@@ -2868,27 +3108,22 @@ async function addManualAttendee(){
   var name=document.getElementById('ma-name').value.trim();
   var role=document.getElementById('ma-role').value.trim();
   var dept=document.getElementById('ma-dept').value.trim();
-  if(!name||!role||!dept){alert('Name, Role, and Department required.');return;}
+  var email=document.getElementById('ma-email')?document.getElementById('ma-email').value.trim():'';
+  if(!name||!role||!dept){showToast('Name, Role, and Department required','error');return;}
   if(!DB.attendance[activeSession])DB.attendance[activeSession]=[];
-  var newAtt={name:name,role:role,dept:dept,eid:'',email:'',timestamp:new Date().toISOString(),manual:true};
+  var newAtt={name:name,role:role,dept:dept,eid:'',email:email,timestamp:new Date().toISOString(),manual:true};
   await saveAttendee(activeSession, newAtt);
   DB.attendance[activeSession].push(newAtt);
-  ['ma-name','ma-role','ma-dept'].forEach(function(id){document.getElementById(id).value='';});
-  var s=DB.sessions.find(function(x){return x.id===activeSession;});
-  var recs=DB.attendance[activeSession]||[];
-  document.getElementById('sd-count').textContent=recs.length+(s.capacity?' / '+s.capacity:'');
-  renderDetailAttendance(recs);
+  openSessionDetail(activeSession);  // Re-render to refresh count + list
   updateTrainingStats();renderTraining();
+  showToast(name+' added','success');
 }
 
 async function removeAttendee(sid,idx){
   if(!confirm('Remove this attendee?'))return;
   await deleteAttendeeDB(sid,idx);
   DB.attendance[sid].splice(idx,1);
-  var recs=DB.attendance[sid]||[];
-  var s=DB.sessions.find(function(x){return x.id===sid;});
-  document.getElementById('sd-count').textContent=recs.length+(s.capacity?' / '+s.capacity:'');
-  renderDetailAttendance(recs);
+  openSessionDetail(sid);  // Re-render to refresh count + list
   updateTrainingStats();renderTraining();
 }
 
@@ -2940,6 +3175,19 @@ async function deleteSession(id){
   renderTraining();updateTrainingStats();
 }
 
+async function markSessionComplete(id) {
+  var s=DB.sessions.find(function(x){return x.id===id;});
+  if(!s)return;
+  s.status='completed';
+  await saveSession(s);
+  var atts=DB.attendance[id]||[];
+  var emailCount=atts.filter(function(a){return a.email&&a.email.trim();}).length;
+  sendCertificateEmails(s, atts);
+  renderTraining();updateTrainingStats();
+  openSessionDetail(id);  // Refresh modal to hide "Mark Complete" button
+  showToast('Session marked complete'+(emailCount?' — '+emailCount+' certificate email'+(emailCount>1?'s':'')+' sent':''), 'success');
+}
+
 function openCert(sid,idx){
   var s=DB.sessions.find(function(x){return x.id===sid;});
   var r=DB.attendance[sid][idx];
@@ -2963,30 +3211,7 @@ function printCert(){
   setTimeout(function(){w.print();},400);
 }
 
-function sendCertificateEmails(session, attendees) {
-  var facility = (DB.settings && DB.settings.hosp) || 'Your Facility';
-  var instructor = session.instructor || 'Instructor';
-  var dateStr = fDate(session.date);
-  var ceuLine = session.hours ? 'CEU Hours: ' + session.hours + '\n' : '';
-  var withEmails = (attendees || []).filter(function(a){ return a.email && a.email.trim(); });
-  if (!withEmails.length) return;
-
-  var emails = withEmails.map(function(a){ return a.email.trim(); }).join(',');
-  var subject = 'Certificate of Completion — ' + session.title;
-  var body = 'Congratulations!\n\nYou have successfully completed the following training:\n\n' +
-    'Course: ' + session.title + '\n' +
-    'Date: ' + dateStr + '\n' +
-    ceuLine +
-    'Instructor: ' + instructor + '\n' +
-    'Facility: ' + facility + '\n\n' +
-    'This email serves as your official record of completion. Please retain for your training file.\n\n' +
-    'Thank you,\n' + facility;
-
-  window.location.href = 'mailto:' + encodeURIComponent(emails) +
-    '?subject=' + encodeURIComponent(subject) +
-    '&body=' + encodeURIComponent(body);
-  showToast('Certificate email prepared for ' + withEmails.length + ' attendee' + (withEmails.length > 1 ? 's' : ''), 'success');
-}
+// sendCertificateEmails is defined further down (uses EmailJS with mailto: fallback)
 
 
 function renderAllAttendees(){
@@ -3196,11 +3421,12 @@ function printQR(){
   w.document.close();setTimeout(function(){w.print();},500);
 }
 
+function tryParse(s){try{return JSON.parse(s);}catch(e){return {};}}
 function fDate(d){if(!d)return'';return new Date(d+'T12:00:00').toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric',year:'numeric'});}
 
 function fTime(t){if(!t)return'';var parts=t.split(':').map(Number);var h=parts[0],m=parts[1];return(h%12||12)+':'+(String(m).padStart(2,'0'))+' '+(h>=12?'PM':'AM');}
 
-async function fTS(ts){return new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
+function fTS(ts){if(!ts)return'—';try{return new Date(ts).toLocaleString('en-US',{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}catch(e){return ts;}}
 
 async function sbGet(table) {
   var q = _sb.from(table).select('*');
@@ -3293,14 +3519,18 @@ async function loadAllData() {
     DB.templates = tmplRes.data || [];
 
     // Rounds
-    var roundsQ = _sb.from('rounds').select('*'); if (uid) roundsQ = roundsQ.eq('user_id', uid);
+    var roundsQ = _sb.from('rounds').select('*').order('created', {ascending: false});
+    if (uid) roundsQ = roundsQ.eq('user_id', uid);
     var roundsRes = await roundsQ;
     if (roundsRes.error) throw new Error('rounds: ' + roundsRes.error.message);
     DB.rounds = (roundsRes.data || []).map(function(r) {
+      var stats   = typeof r.stats   === 'string' ? tryParse(r.stats)   : (r.stats   || {});
+      var answers = typeof r.answers === 'string' ? tryParse(r.answers) : (r.answers || {});
       return Object.assign({}, r, {
         responses: r.responses || {},
         deficiencies: r.deficiencies || [],
-        stats: r.stats || {}
+        stats: stats,
+        answers: answers
       });
     });
 
@@ -3423,6 +3653,7 @@ async function init(){
       var initEl = document.getElementById('nav-initials');
       if (initEl) initEl.textContent = (session.user.email || 'U')[0].toUpperCase();
       hideLoginScreen();
+      loadUserProfile(session.user.id);
       var hash = window.location.hash;
       if(hash.indexOf('#signin-')===0){showView('signin');loadSignIn(hash.replace('#signin-',''));}
       else showView('dashboard');
@@ -3430,6 +3661,7 @@ async function init(){
         setGreeting();
         kbLoadFromSupabase();
         tlibLoad();
+        initEmailJS();
         if(DB.settings && DB.settings.appLogo){var logo=document.getElementById('nav-logo');if(logo){logo.src=DB.settings.appLogo;logo.style.display='block';}}
         if(DB.settings && DB.settings.username){
           var p=DB.settings.username.split(' ');
@@ -4038,8 +4270,7 @@ async function submitRound(skipComplete){
     '<span style="font-size:13px;color:var(--t2);">'+passedStr+' &middot; '+failedStr+' &middot; '+skipped+' N/A</span>';
 
   showToast('Round submitted — '+score+'%', 'success');
-  var sr = document.getElementById('stat-rounds');
-  if(sr) sr.textContent = DB.rounds.length;
+  updateDashboardStats();
 }
 
 function openRoundsHistory(){
@@ -4612,122 +4843,6 @@ function openOverdueModal(){
 }
 
 
-/* ── SAFETY MODULE ──────────────────────────────────────────── */
-var LINEN_CHECKLIST = [
-  'Soiled and clean linen are processed and transported separately — no cross-contamination',
-  'Workers handling soiled linen wearing required PPE (gloves, gown, mask)',
-  'Chemical safety requirements in place — SDS accessible for all laundry chemicals',
-  'Transport vehicles/carts are clean, covered, and in good condition',
-  'Processing documentation provided — wash temperatures, cycle records',
-  'Facility is clean, organized, and free of pest activity',
-  'No evidence of bloodborne pathogen exposure hazards',
-  'Current HLAC accreditation certificate on file (if applicable)'
-];
-var LINEN_INSPECTIONS = [];
-var SAFETY_MEETINGS = [];
-
-function openLinenVendorModal(){
-  var cl = document.getElementById('lv-checklist');
-  if(cl && !cl.children.length){
-    LINEN_CHECKLIST.forEach(function(item, i){
-      var d = document.createElement('div');
-      d.style.cssText = 'display:flex;align-items:flex-start;gap:10px;padding:8px 0;border-bottom:1px solid var(--bd);';
-      d.innerHTML = '<select id="lv-cl-'+i+'" style="background:var(--s3);border:1.5px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:11px;padding:4px 8px;outline:none;flex-shrink:0;">'
-        +'<option value="pass">Pass</option><option value="fail">Fail</option><option value="na">N/A</option></select>'
-        +'<span style="font-size:12px;color:var(--t2);">'+item+'</span>';
-      cl.appendChild(d);
-    });
-  }
-  // set today
-  var di = document.getElementById('lv-date');
-  if(di && !di.value) di.value = new Date().toISOString().split('T')[0];
-}
-
-function saveLinenInspection(){
-  var vendor = document.getElementById('lv-vendor').value.trim();
-  var date = document.getElementById('lv-date').value;
-  if(!vendor||!date){ showToast('Vendor name and date required','error'); return; }
-  var answers = {};
-  LINEN_CHECKLIST.forEach(function(item,i){
-    var sel = document.getElementById('lv-cl-'+i);
-    if(sel) answers[i] = sel.value;
-  });
-  var inspection = {
-    id:'LV-'+Date.now(), vendor:vendor, date:date,
-    inspector: document.getElementById('lv-inspector').value,
-    result: document.getElementById('lv-result').value,
-    findings: document.getElementById('lv-findings').value,
-    answers: answers, created: new Date().toISOString()
-  };
-  LINEN_INSPECTIONS.unshift(inspection);
-  closeModal('linenVendorModal');
-  renderLinenLog();
-  showToast('Linen vendor inspection saved','success');
-}
-
-function renderLinenLog(){
-  var log = document.getElementById('linen-vendor-log');
-  if(!log) return;
-  if(!LINEN_INSPECTIONS.length){
-    log.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No linen vendor inspections on record</p></div>';
-    return;
-  }
-  var resultColors = {pass:'var(--green)',fail:'var(--red)',conditional:'var(--yellow)'};
-  log.innerHTML = '';
-  LINEN_INSPECTIONS.forEach(function(ins){
-    var col = resultColors[ins.result]||'var(--t3)';
-    var d = document.createElement('div');
-    d.style.cssText = 'display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);';
-    d.innerHTML = '<div style="width:8px;height:8px;border-radius:50%;background:'+col+';flex-shrink:0;"></div>'
-      +'<div style="flex:1;">'
-      +'<div style="font-weight:800;font-size:13px;color:var(--t1);">'+ins.vendor+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);">'+ins.date+' · Inspected by: '+ins.inspector+'</div>'
-      +(ins.findings?'<div style="font-size:12px;color:var(--t2);margin-top:2px;">'+ins.findings.substring(0,100)+'</div>':'')
-      +'</div>'
-      +'<span style="font-size:11px;background:'+col+'22;color:'+col+';border-radius:999px;padding:3px 10px;font-weight:700;text-transform:capitalize;">'+ins.result.replace('-',' ')+'</span>';
-    log.appendChild(d);
-  });
-}
-
-function saveSafetyMeeting(){
-  var date = document.getElementById('sm-date').value;
-  var facilitator = document.getElementById('sm-facilitator').value.trim();
-  if(!date||!facilitator){ showToast('Date and facilitator required','error'); return; }
-  var meeting = {
-    id:'SM-'+Date.now(), date:date,
-    location: document.getElementById('sm-location').value,
-    attendees: document.getElementById('sm-attendees').value,
-    topics: document.getElementById('sm-topics').value,
-    actions: document.getElementById('sm-actions').value,
-    facilitator: facilitator, created: new Date().toISOString()
-  };
-  SAFETY_MEETINGS.unshift(meeting);
-  closeModal('safetyMeetingModal');
-  renderSafetyMeetingLog();
-  showToast('Safety meeting agenda saved','success');
-}
-
-function renderSafetyMeetingLog(){
-  var log = document.getElementById('safety-meeting-log');
-  if(!log) return;
-  if(!SAFETY_MEETINGS.length){
-    log.innerHTML = '<div class="empty-state" style="padding:20px 0;"><p class="empty-title" style="font-size:13px;">No meeting agendas on record</p></div>';
-    return;
-  }
-  log.innerHTML = '';
-  SAFETY_MEETINGS.forEach(function(m){
-    var d = document.createElement('div');
-    d.style.cssText = 'display:flex;align-items:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);';
-    d.innerHTML = '<div style="flex:1;">'
-      +'<div style="font-weight:800;font-size:13px;color:var(--t1);">Safety Committee Meeting — '+m.date+'</div>'
-      +'<div style="font-size:11px;color:var(--t3);">'+(m.location?m.location+' · ':'')+' Facilitated by: '+m.facilitator+'</div>'
-      +(m.actions?'<div style="font-size:12px;color:var(--t2);margin-top:3px;"><strong>Actions:</strong> '+m.actions.substring(0,120)+'</div>':'')
-      +'</div>';
-    log.appendChild(d);
-  });
-}
-
-
 /* ── ACCORDION / REF PANEL TOGGLE ─────────────────────────── */
 function toggleRef(id){
   var body = document.getElementById(id);
@@ -4988,19 +5103,22 @@ function exportFullReport(){
 
 
 function saveNewSession(){
-  var topic = document.getElementById('ct-topic').value.trim();
+  var title = document.getElementById('ct-topic').value.trim();
   var date  = document.getElementById('ct-date').value;
-  if(!topic || !date){ showToast('Topic and date are required','error'); return; }
+  if(!title || !date){ showToast('Topic and date are required','error'); return; }
   var session = {
     id: 'TR-'+Date.now(),
-    topic: topic,
+    title: title,
     date: date,
+    time: '',
     duration: document.getElementById('ct-duration').value,
-    dept: document.getElementById('ct-dept').value,
-    trainer: document.getElementById('ct-trainer').value,
+    location: document.getElementById('ct-dept').value,  // dept used as location hint
+    instructor: document.getElementById('ct-trainer').value,
     category: document.getElementById('ct-category').value,
     nextDate: document.getElementById('ct-nextdate').value,
-    notes: document.getElementById('ct-notes').value,
+    desc: document.getElementById('ct-notes').value,
+    hours: '',
+    status: 'scheduled',
     created: new Date().toISOString()
   };
   DB.sessions = DB.sessions || [];
@@ -5081,10 +5199,12 @@ async function handleAuthSubmit(e) {
     if (initEl) initEl.textContent = 'A';
     hideLoginScreen();
     showView('dashboard');
+    loadUserProfile('admin-local');
     loadAllData().then(function(){
       setGreeting();
       kbLoadFromSupabase();
       tlibLoad();
+      initEmailJS();
       if(DB.settings && DB.settings.username){
         var p=DB.settings.username.split(' ');
         document.getElementById('nav-initials').textContent=(p[0][0]+(p[1]?p[1][0]:'')).toUpperCase();
@@ -5140,7 +5260,7 @@ async function doLogout() {
   showLoginScreen();
 }
 
-document.addEventListener("DOMContentLoaded", function(){ initTheme(); init(); });
+document.addEventListener("DOMContentLoaded", function(){ initTheme(); init(); registerSW(); initPWA(); initEmailJS(); });
 
 // ── SECURITY INCIDENTS — SUPABASE PERSISTENCE ────────────────────────────────
 
@@ -5305,11 +5425,15 @@ var TLIB_DOCS = [];
 // Load on init — called after loadAllData() resolves
 async function tlibLoad() {
   try {
-    var res = await _sb.from('knowledge_base').select('*')
+    var uid = realUserId();
+    var q = _sb.from('knowledge_base').select('*')
       .eq('category', 'Training Library')
       .order('created', {ascending: false});
+    if (uid) q = q.eq('user_id', uid);
+    var res = await q;
     if (res.error) throw res.error;
     TLIB_DOCS = res.data || [];
+    tlibRender(TLIB_DOCS);
   } catch(e) {
     console.error('tlibLoad failed:', e.message);
   }
@@ -5705,25 +5829,48 @@ function submitAssessment(modalId, type) { showToast(type+' assessment saved ✓
 
 <!-- ══ Edit Session Modal ═══════════════════════════════════ -->
 <div id="editSessionModal" class="overlay" onclick="if(event.target===this)closeModal('editSessionModal')">
-  <div class="modal" style="max-width:560px;">
+  <div class="modal" style="max-width:580px;max-height:90vh;overflow-y:auto;">
     <div class="mhead">
       <div class="mtitle">Edit Training Session</div>
       <button class="mclose" onclick="closeModal('editSessionModal')">&times;</button>
     </div>
-    <div style="padding:20px;display:flex;flex-direction:column;gap:14px;">
-      <input type="hidden" id="es-id"/>
-      <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Topic / Title *</label><input type="text" id="es-topic" class="finp"/></div>
+    <div style="padding:20px;display:flex;flex-direction:column;gap:12px;">
+      <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Topic / Title *</label><input type="text" id="et-title" class="finp" placeholder="e.g. Fire Safety Annual Training"/></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Date</label><input type="date" id="es-date" class="finp"/></div>
-        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Duration (min)</label><input type="number" id="es-duration" class="finp"/></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Date</label><input type="date" id="et-date" class="finp"/></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Time</label><input type="time" id="et-time" class="finp"/></div>
       </div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Department</label><input type="text" id="es-dept" class="finp"/></div>
-        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Trainer</label><input type="text" id="es-trainer" class="finp"/></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Location</label><input type="text" id="et-loc" class="finp" placeholder="Conference Room A"/></div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Instructor</label><input type="text" id="et-instr" class="finp"/></div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Next Due Date</label><input type="date" id="es-nextdate" class="finp"/></div>
-      <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Notes</label><textarea id="es-notes" class="finp" rows="2"></textarea></div>
-      <div style="display:flex;gap:8px;justify-content:flex-end;">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Category</label>
+          <select id="et-cat" class="finp">
+            <option value="Life Safety">Life Safety</option>
+            <option value="Infection Control">Infection Control</option>
+            <option value="Emergency Management">Emergency Management</option>
+            <option value="Hazmat">Hazmat</option>
+            <option value="Security">Security</option>
+            <option value="Orientation">Orientation</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">CEU Hours</label><input type="number" id="et-hrs" class="finp" placeholder="1.0" step="0.5"/></div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Status</label>
+          <select id="et-status" class="finp">
+            <option value="scheduled">Scheduled</option>
+            <option value="completed">Completed</option>
+            <option value="cancelled">Cancelled</option>
+          </select>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Max Capacity</label><input type="number" id="et-cap" class="finp" placeholder="50"/></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;"><label class="flbl">Description / Notes</label><textarea id="et-desc" class="finp" rows="2" placeholder="Optional notes or learning objectives…"></textarea></div>
+      <div style="display:flex;gap:8px;justify-content:flex-end;padding-top:4px;">
+        <button class="btn btn-red btn-sm" onclick="deleteSession(activeSession)">Delete</button>
         <button class="btn btn-ghost" onclick="closeModal('editSessionModal')">Cancel</button>
         <button class="btn btn-green" onclick="saveEditSession()">Save Changes</button>
       </div>
@@ -5740,11 +5887,12 @@ function submitAssessment(modalId, type) { showToast(type+' assessment saved ✓
     </div>
     <div style="padding:24px;">
       <div id="qrcode-el" style="display:flex;justify-content:center;margin-bottom:16px;"></div>
-      <div id="qr-session-title" style="font-weight:800;font-size:14px;color:var(--t1);margin-bottom:6px;"></div>
-      <div id="qr-session-date" style="font-size:12px;color:var(--t3);margin-bottom:20px;"></div>
+      <div id="qr-title" style="font-weight:800;font-size:14px;color:var(--t1);margin-bottom:4px;"></div>
+      <div id="qr-meta" style="font-size:12px;color:var(--t3);margin-bottom:8px;"></div>
+      <div id="qr-url" style="font-size:10px;color:var(--t3);word-break:break-all;margin-bottom:16px;padding:8px;background:var(--s3);border-radius:6px;"></div>
       <div style="display:flex;gap:8px;justify-content:center;">
         <button class="btn btn-ghost" onclick="closeModal('qrModal')">Close</button>
-        <button class="btn btn-green" onclick="printQR()">Print QR</button>
+        <button class="btn btn-green" onclick="printQR()">🖨 Print QR</button>
       </div>
     </div>
   </div>
@@ -6192,5 +6340,293 @@ function submitAssessment(modalId, type) { showToast(type+' assessment saved ✓
     <div style="display:flex;gap:10px;margin-top:20px;justify-content:flex-end;"><button class="btn" style="background:var(--bg2);color:var(--t2);" onclick="closeModal('drillLogModal')">Cancel</button><button class="btn btn-blue" onclick="submitAssessment('drillLogModal','Emergency Drill')">📋 Save Drill Log</button></div>
   </div>
 </div>
+
+<script>
+// ══════════════════════════════════════════════════════════════
+//  PWA — Service Worker Registration
+// ══════════════════════════════════════════════════════════════
+function registerSW() {
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').then(function(reg) {
+      console.log('[SW] Registered, scope:', reg.scope);
+    }).catch(function(err) {
+      console.warn('[SW] Registration failed:', err);
+    });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  PWA — Install Prompt
+// ══════════════════════════════════════════════════════════════
+var _deferredInstallPrompt = null;
+
+function initPWA() {
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault();
+    _deferredInstallPrompt = e;
+    // Show banner after 3 seconds if not dismissed before
+    if (!localStorage.getItem('hso_install_dismissed')) {
+      setTimeout(function() {
+        var banner = document.getElementById('install-banner');
+        if (banner) banner.classList.add('visible');
+      }, 3000);
+    }
+  });
+  window.addEventListener('appinstalled', function() {
+    var banner = document.getElementById('install-banner');
+    if (banner) banner.classList.remove('visible');
+    _deferredInstallPrompt = null;
+    showToast('HSO Platform installed!', 'success');
+  });
+}
+
+function triggerInstall() {
+  if (!_deferredInstallPrompt) return;
+  _deferredInstallPrompt.prompt();
+  _deferredInstallPrompt.userChoice.then(function(result) {
+    if (result.outcome === 'accepted') showToast('Installing HSO Platform…', 'success');
+    _deferredInstallPrompt = null;
+    dismissInstall();
+  });
+}
+
+function dismissInstall() {
+  var banner = document.getElementById('install-banner');
+  if (banner) banner.classList.remove('visible');
+  localStorage.setItem('hso_install_dismissed', '1');
+}
+
+// ══════════════════════════════════════════════════════════════
+//  EmailJS — Real Email Sending
+// ══════════════════════════════════════════════════════════════
+function initEmailJS() {
+  // Load keys from DB.settings if available (set in Settings page)
+  setTimeout(function() {
+    if (DB.settings && DB.settings.ejs_public_key) {
+      EMAILJS_PUBLIC_KEY  = DB.settings.ejs_public_key || '';
+      EMAILJS_SERVICE_ID  = DB.settings.ejs_service_id || '';
+      EMAILJS_TEMPLATE_ID = DB.settings.ejs_template_id || '';
+    }
+    if (EMAILJS_PUBLIC_KEY && typeof emailjs !== 'undefined') {
+      emailjs.init({ publicKey: EMAILJS_PUBLIC_KEY });
+      console.log('[EmailJS] Initialized');
+    }
+  }, 2000);
+}
+
+// Send a single email via EmailJS or fall back to mailto
+async function sendEmail(toEmail, toName, subject, bodyText) {
+  if (ejsReady() && typeof emailjs !== 'undefined') {
+    try {
+      await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {
+        to_email:   toEmail,
+        to_name:    toName || toEmail,
+        subject:    subject,
+        message:    bodyText,
+        from_name:  (DB.settings && DB.settings.hosp) || 'HSO Platform',
+        reply_to:   (DB.settings && DB.settings.email) || ''
+      });
+      return true;
+    } catch(e) {
+      console.error('[EmailJS] Send failed:', e);
+      return false;
+    }
+  }
+  // Fallback: open mailto
+  window.location.href = 'mailto:' + encodeURIComponent(toEmail) +
+    '?subject=' + encodeURIComponent(subject) +
+    '&body=' + encodeURIComponent(bodyText);
+  return false;
+}
+
+// Send batch emails (certificates, round reports, etc.)
+async function sendBatchEmails(recipients, subjectFn, bodyFn) {
+  // recipients = [{email, name, ...}]
+  var withEmail = recipients.filter(function(r){ return r.email && r.email.trim(); });
+  if (!withEmail.length) { showToast('No email addresses on file', 'error'); return; }
+
+  if (ejsReady() && typeof emailjs !== 'undefined') {
+    var sent = 0, failed = 0;
+    for (var i = 0; i < withEmail.length; i++) {
+      var r = withEmail[i];
+      var ok = await sendEmail(r.email, r.name, subjectFn(r), bodyFn(r));
+      ok ? sent++ : failed++;
+    }
+    showToast('Sent ' + sent + ' email' + (sent !== 1 ? 's' : '') + (failed ? ' (' + failed + ' failed)' : ''), sent > 0 ? 'success' : 'error');
+  } else {
+    // Batch mailto fallback
+    var emails = withEmail.map(function(r){ return r.email.trim(); }).join(',');
+    var first = withEmail[0];
+    window.location.href = 'mailto:' + encodeURIComponent(emails) +
+      '?subject=' + encodeURIComponent(subjectFn(first)) +
+      '&body=' + encodeURIComponent(bodyFn(first));
+    showToast('Email client opened for ' + withEmail.length + ' recipient' + (withEmail.length !== 1 ? 's' : ''), 'success');
+  }
+}
+
+// ── Upgrade sendCertificateEmails to use real sending ────────
+function sendCertificateEmails(session, attendees) {
+  var facility   = (DB.settings && DB.settings.hosp) || 'Your Facility';
+  var instructor = session.instructor || 'Instructor';
+  var dateStr    = fDate(session.date);
+  var ceuLine    = session.hours ? 'CEU Hours: ' + session.hours + '\n' : '';
+  var withEmails = (attendees || []).filter(function(a){ return a.email && a.email.trim(); });
+  if (!withEmails.length) return;
+
+  sendBatchEmails(
+    withEmails,
+    function(r) { return 'Certificate of Completion — ' + session.title; },
+    function(r) {
+      return 'Dear ' + r.name + ',\n\n' +
+        'Congratulations! You have successfully completed the following training:\n\n' +
+        'Course: ' + session.title + '\n' +
+        'Date: ' + dateStr + '\n' +
+        ceuLine +
+        'Instructor: ' + instructor + '\n' +
+        'Facility: ' + facility + '\n\n' +
+        'This email serves as your official record of completion. Please retain for your training file.\n\n' +
+        'Thank you,\n' + facility;
+    }
+  );
+}
+
+// ══════════════════════════════════════════════════════════════
+//  User Profile & Role Management
+// ══════════════════════════════════════════════════════════════
+async function loadUserProfile(userId) {
+  if (!userId || userId === 'admin-local') {
+    CURRENT_USER_ROLE    = 'admin';
+    CURRENT_USER_PROFILE = { role: 'admin', full_name: 'Admin', email: 'admin@icellence.com' };
+    applyRoleUI();
+    return;
+  }
+  try {
+    var res = await _sb.from('profiles').select('*').eq('id', userId).single();
+    if (res.data) {
+      CURRENT_USER_PROFILE = res.data;
+      CURRENT_USER_ROLE    = res.data.role || 'staff';
+    }
+  } catch(e) { console.warn('Profile load failed:', e.message); }
+  applyRoleUI();
+}
+
+async function upsertProfile(fields) {
+  if (!CURRENT_USER_ID || CURRENT_USER_ID === 'admin-local') return;
+  try {
+    await _sb.from('profiles').upsert(
+      Object.assign({ id: CURRENT_USER_ID, email: CURRENT_USER && CURRENT_USER.email }, fields),
+      { onConflict: 'id' }
+    );
+  } catch(e) { console.warn('Profile upsert failed:', e.message); }
+}
+
+function applyRoleUI() {
+  // Show role badge in nav avatar tooltip
+  var av = document.getElementById('nav-initials');
+  if (av) av.title = 'Settings — ' + CURRENT_USER_ROLE.replace('_', ' ');
+  // Update role badge in settings
+  var rb = document.getElementById('set-role-display');
+  if (rb) {
+    rb.textContent = CURRENT_USER_ROLE.replace('_',' ');
+    rb.className = 'role-badge role-' + CURRENT_USER_ROLE.replace('_','-');
+  }
+  // Show/hide admin-only elements
+  var adminOnly = document.querySelectorAll('[data-role="admin"]');
+  adminOnly.forEach(function(el) {
+    el.style.display = (CURRENT_USER_ROLE === 'admin') ? '' : 'none';
+  });
+  // Show user management card for admins
+  var card = document.getElementById('admin-users-card');
+  if (card) {
+    card.style.display = isAdmin() ? '' : 'none';
+    if (isAdmin()) loadAllUsers();
+  }
+}
+
+function isAdmin() { return CURRENT_USER_ROLE === 'admin'; }
+function isSafetyOfficer() { return CURRENT_USER_ROLE === 'admin' || CURRENT_USER_ROLE === 'safety_officer'; }
+
+// ══════════════════════════════════════════════════════════════
+//  Admin User Management
+// ══════════════════════════════════════════════════════════════
+async function loadAllUsers() {
+  var card = document.getElementById('admin-users-card');
+  if (!isAdmin()) { if (card) card.style.display = 'none'; return; }
+  if (card) card.style.display = '';
+
+  var list = document.getElementById('users-list');
+  if (!list) return;
+  list.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3);">Loading…</div>';
+
+  try {
+    if (!_sb) throw new Error('Supabase not available');
+    // For admin-local bypass, we can't actually query profiles from another user's perspective
+    // But the admin bypass can still query all profiles since we set service role via SECURITY DEFINER
+    var res = await _sb.from('profiles').select('*').order('created', {ascending: true});
+    if (res.error) throw res.error;
+    var users = res.data || [];
+    if (!users.length) {
+      list.innerHTML = '<div style="padding:16px;text-align:center;color:var(--t3);font-size:13px;">No users found. Run supabase_roles.sql first.</div>';
+      return;
+    }
+    var roleColors = {admin:'var(--green)',safety_officer:'var(--blue)',staff:'var(--t3)'};
+    list.innerHTML = users.map(function(u) {
+      var rc = roleColors[u.role] || 'var(--t3)';
+      var isMe = u.email === (CURRENT_USER && CURRENT_USER.email);
+      return '<div style="display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--bd);">' +
+        '<div style="width:32px;height:32px;border-radius:50%;background:'+rc+'22;color:'+rc+';display:flex;align-items:center;justify-content:center;font-weight:800;font-size:14px;flex-shrink:0;">' +
+          (u.full_name || u.email || '?')[0].toUpperCase() +
+        '</div>' +
+        '<div style="flex:1;min-width:0;">' +
+          '<div style="font-size:13px;font-weight:700;color:var(--t1);">' + (u.full_name || '—') + (isMe ? ' <span style="font-size:10px;color:var(--t3);">(you)</span>' : '') + '</div>' +
+          '<div style="font-size:11px;color:var(--t3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + (u.email || '—') + '</div>' +
+        '</div>' +
+        '<select onchange="setUserRole(\''+u.id+'\',this.value)" style="background:var(--s3);border:1.5px solid var(--bd2);border-radius:8px;color:var(--t1);font-size:12px;padding:4px 8px;outline:none;">' +
+          '<option value="admin"'+(u.role==='admin'?' selected':'')+'>Admin</option>' +
+          '<option value="safety_officer"'+(u.role==='safety_officer'?' selected':'')+'>Safety Officer</option>' +
+          '<option value="staff"'+(u.role==='staff'?' selected':'')+'>Staff</option>' +
+        '</select>' +
+      '</div>';
+    }).join('');
+  } catch(e) {
+    list.innerHTML = '<div style="padding:16px;color:var(--red);font-size:12px;">Error loading users: ' + e.message + '<br><small>Make sure supabase_roles.sql has been run in your Supabase SQL Editor.</small></div>';
+  }
+}
+
+async function setUserRole(userId, newRole) {
+  if (!isAdmin()) { showToast('Admin access required', 'error'); return; }
+  try {
+    var res = await _sb.from('profiles').update({role: newRole}).eq('id', userId);
+    if (res.error) throw res.error;
+    showToast('Role updated to ' + newRole.replace('_', ' '), 'success');
+  } catch(e) {
+    showToast('Failed to update role: ' + e.message, 'error');
+    loadAllUsers();  // Reload to revert UI
+  }
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Bottom Nav Helper
+// ══════════════════════════════════════════════════════════════
+function bnav(active) {
+  var map = { dashboard:'dashboard', rounds:'rounds', training:'training', kb:'kb', settings:'settings' };
+  Object.keys(map).forEach(function(k) {
+    var btn = document.getElementById('bnav-' + k);
+    if (btn) btn.classList.toggle('active', k === active);
+  });
+}
+
+// Hook bnav into showView so desktop nav also keeps mobile nav in sync
+var _origShowView = typeof showView === 'function' ? showView : null;
+document.addEventListener('DOMContentLoaded', function() {
+  // Patch showView after it's defined
+  var origShowView = showView;
+  window.showView = function(v) {
+    origShowView(v);
+    var bkeys = ['dashboard','rounds','training','kb','settings'];
+    if (bkeys.indexOf(v) >= 0) bnav(v);
+  };
+});
+</script>
 
 </html>
